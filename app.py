@@ -1,175 +1,445 @@
+
 import streamlit as st
+import streamlit.components.v1 as components
 
 st.set_page_config(
-    page_title="School Escape 3D",
-    page_icon="🏃‍♂️",
+    page_title="NEXTBOT: Lost Mall",
+    page_icon="👁️",
     layout="wide",
+    initial_sidebar_state="collapsed",
 )
 
-# Ẩn giao diện mặc định của Streamlit
 st.markdown("""
-    <style>
-    #MainMenu {visibility: hidden;}
-    footer {visibility: hidden;}
-    header {visibility: hidden;}
-    .block-container {padding: 0rem;}
-    </style>
+<style>
+    .stApp { background: #080b10; color: white; }
+    header, footer, #MainMenu { visibility: hidden; }
+    .block-container { padding: 1rem 1rem 0; max-width: 1600px; }
+    h1 { color: #ff4242; text-align: center; }
+</style>
 """, unsafe_allow_html=True)
 
-# Tách nội dung HTML/JS thành các phần hoặc đọc trực tiếp an toàn
-GAME_HTML = """
+st.markdown("# 👁️ NEXTBOT: LOST MALL")
+st.caption("SURVIVE THE NIGHT • COLLECT ORBS • DON'T GET CAUGHT")
+
+game_html = r"""
 <!DOCTYPE html>
-<html lang="vi">
+<html>
 <head>
-    <meta charset="UTF-8">
-    <title>School Escape 3D</title>
-    <style>
-        body { margin: 0; overflow: hidden; background: #000; font-family: monospace; user-select: none; }
-        #ui { position: absolute; top: 10px; left: 10px; color: white; font-size: 18px; text-shadow: 2px 2px 4px #000; pointer-events: none; }
-        #crosshair { position: absolute; top: 50%; left: 50%; width: 10px; height: 10px; transform: translate(-50%, -50%); border: 2px solid rgba(255,255,255,0.7); border-radius: 50%; pointer-events: none; }
-        #instruction { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); background: rgba(0,0,0,0.85); color: white; padding: 25px; text-align: center; border-radius: 10px; border: 2px solid #fff; cursor: pointer; }
-        #gameover, #win { position: absolute; top: 0; left: 0; width: 100%; height: 100%; display: none; flex-direction: column; justify-content: center; align-items: center; font-size: 32px; z-index: 10; color: white; }
-        #gameover { background: rgba(100,0,0,0.9); }
-        #win { background: rgba(0,100,0,0.9); }
-        .btn { padding: 10px 20px; background: #ff4757; color: white; border: none; font-size: 20px; border-radius: 5px; cursor: pointer; margin-top: 15px; font-weight: bold; }
-        .btn:hover { background: #ff6b81; }
-    </style>
+<meta charset="utf-8">
+<style>
+* { box-sizing: border-box; }
+body {
+    margin: 0; background: #05070b; color: white;
+    font-family: Arial, sans-serif; overflow: hidden;
+}
+#game { position: relative; width: 100%; height: 680px; overflow: hidden; }
+canvas { display: block; width: 100%; height: 100%; }
+#hud {
+    position:absolute; inset:0; pointer-events:none;
+    text-shadow: 0 2px 5px black;
+}
+#top {
+    display:flex; justify-content:space-between;
+    padding:18px; font-size:18px; font-weight:bold;
+}
+#crosshair {
+    position:absolute; top:50%; left:50%;
+    transform:translate(-50%,-50%); font-size:24px;
+}
+#message {
+    position:absolute; top:43%; width:100%;
+    text-align:center; font-size:22px; font-weight:bold;
+}
+#overlay {
+    position:absolute; inset:0; display:flex;
+    align-items:center; justify-content:center;
+    background:rgba(0,0,0,.78); text-align:center;
+}
+.panel { max-width:480px; padding:25px; }
+h1 { color:#ff4545; font-size:38px; }
+button {
+    pointer-events:auto; border:0; border-radius:8px;
+    padding:14px 30px; color:white; background:#e52b3d;
+    font-size:18px; font-weight:bold; cursor:pointer;
+}
+small { color:#c0c6d0; line-height:1.8; }
+#stamina {
+    position:absolute; bottom:28px; left:50%;
+    transform:translateX(-50%); width:210px;
+    height:9px; background:#333; border-radius:5px;
+}
+#bar { width:100%; height:100%; background:#64e6ff; border-radius:5px; }
+</style>
 </head>
 <body>
-    <div id="ui">Chìa khóa: <span id="keysCount">0</span>/3</div>
-    <div id="crosshair"></div>
-    <div id="instruction">
-        <h2>TRƯỜNG HỌC KINH DỊ 3D</h2>
-        <p><b>W, A, S, D</b> để di chuyển | <b>Chuột</b> để nhìn xung quanh</p>
-        <p style="color: #ff4757;"><b>Click vào đây để bắt đầu chơi!</b></p>
+<div id="game">
+    <div id="hud">
+        <div id="top">
+            <div>ORB: <span id="score">0</span></div>
+            <div id="status">THREAT: LOW</div>
+        </div>
+        <div id="crosshair">+</div>
+        <div id="message"></div>
+        <div id="stamina"><div id="bar"></div></div>
     </div>
-    <div id="gameover">
-        <h1>BẠN ĐÃ BỊ BẮT!</h1>
-        <button class="btn" onclick="location.reload()">Chơi Lại</button>
+    <div id="overlay">
+        <div class="panel">
+            <h1 id="title">NEXTBOT</h1>
+            <p id="subtitle">LOST MALL — SURVIVE IF YOU CAN</p>
+            <small>
+                WASD — Move<br>
+                SHIFT — Sprint<br>
+                MOUSE — Look around<br><br>
+                Collect glowing orbs. Don't let it catch you.
+            </small>
+            <p><button id="start">ENTER THE MALL</button></p>
+            <small>Headphones recommended</small>
+        </div>
     </div>
-    <div id="win">
-        <h1>CHIẾN THẮNG!</h1>
-        <button class="btn" onclick="location.reload()">Chơi Lại</button>
-    </div>
+</div>
 
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
-    <script>
-        let scene, camera, renderer;
-        let moveF = false, moveB = false, moveL = false, moveR = false;
-        let prevTime = performance.now();
-        let velocity = new THREE.Vector3();
-        let direction = new THREE.Vector3();
-        let keysCollected = 0, keyObjects = [], monster;
-        let isOver = false, isWon = false;
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<script>
+(() => {
+const root = document.getElementById('game');
+const overlay = document.getElementById('overlay');
+const startBtn = document.getElementById('start');
+const scoreEl = document.getElementById('score');
+const statusEl = document.getElementById('status');
+const messageEl = document.getElementById('message');
+const barEl = document.getElementById('bar');
 
-        const blocker = document.getElementById('instruction');
-        blocker.addEventListener('click', () => document.body.requestPointerLock());
+const scene = new THREE.Scene();
+scene.background = new THREE.Color(0x080b12);
+scene.fog = new THREE.Fog(0x080b12, 12, 48);
 
-        document.addEventListener('pointerlockchange', () => {
-            if (document.pointerLockElement === document.body) {
-                blocker.style.display = 'none';
-            } else if (!isOver && !isWon) {
-                blocker.style.display = 'block';
-            }
-        });
+const camera = new THREE.PerspectiveCamera(
+    76, root.clientWidth / root.clientHeight, 0.1, 100
+);
+camera.rotation.order = 'YXZ';
+camera.position.set(0, 1.7, 12);
 
-        document.addEventListener('mousemove', (e) => {
-            if (document.pointerLockElement !== document.body) return;
-            camera.rotation.y -= (e.movementX || 0) * 0.002;
-        });
+const renderer = new THREE.WebGLRenderer({antialias:true});
+renderer.setPixelRatio(Math.min(window.devicePixelRatio, 1.7));
+renderer.setSize(root.clientWidth, root.clientHeight);
+renderer.outputEncoding = THREE.sRGBEncoding;
+root.insertBefore(renderer.domElement, root.firstChild);
 
-        window.addEventListener('keydown', (e) => {
-            if (e.code === 'KeyW') moveF = true;
-            if (e.code === 'KeyS') moveB = true;
-            if (e.code === 'KeyA') moveL = true;
-            if (e.code === 'KeyD') moveR = true;
-        });
-        window.addEventListener('keyup', (e) => {
-            if (e.code === 'KeyW') moveF = false;
-            if (e.code === 'KeyS') moveB = false;
-            if (e.code === 'KeyA') moveL = false;
-            if (e.code === 'KeyD') moveR = false;
-        });
+scene.add(new THREE.HemisphereLight(0xb9d8ff, 0x27202c, 1.25));
 
-        init();
-        animate();
+const lights = [];
+for (let x=-16; x<=16; x+=8) {
+    for (let z=-16; z<=16; z+=8) {
+        const light = new THREE.PointLight(0xb9dfff, 1.3, 13);
+        light.position.set(x, 3.7, z);
+        scene.add(light);
+        lights.push(light);
+    }
+}
 
-        function init() {
-            scene = new THREE.Scene();
-            scene.background = new THREE.Color(0x050505);
-            scene.fog = new THREE.FogExp2(0x050505, 0.08);
+const floorMat = new THREE.MeshStandardMaterial({
+    color:0x242934, roughness:0.95
+});
+const floor = new THREE.Mesh(
+    new THREE.PlaneGeometry(42,42), floorMat
+);
+floor.rotation.x=-Math.PI/2;
+floor.position.y=0;
+scene.add(floor);
 
-            camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
-            camera.position.set(0, 1.6, 5);
+const ceiling = new THREE.Mesh(
+    new THREE.PlaneGeometry(42,42),
+    new THREE.MeshStandardMaterial({color:0x151922})
+);
+ceiling.rotation.x=Math.PI/2;
+ceiling.position.y=5;
+scene.add(ceiling);
 
-            renderer = new THREE.WebGLRenderer({ antialias: true });
-            renderer.setSize(window.innerWidth, window.innerHeight);
-            document.body.appendChild(renderer.domElement);
+const wallMat = new THREE.MeshStandardMaterial({
+    color:0x414653, roughness:0.9
+});
+const trimMat = new THREE.MeshStandardMaterial({
+    color:0x8995a6, roughness:0.6
+});
+const obstacles = [];
 
-            scene.add(new THREE.AmbientLight(0x222233));
-            let light = new THREE.PointLight(0xffaa44, 1.5, 15);
-            camera.add(light);
-            scene.add(camera);
+function wall(x,z,w,d,h=4.8) {
+    const mesh = new THREE.Mesh(
+        new THREE.BoxGeometry(w,h,d), wallMat
+    );
+    mesh.position.set(x,h/2,z);
+    scene.add(mesh);
+    obstacles.push({x,z,w,d});
+    return mesh;
+}
 
-            // Tạo môi trường trường học đơn giản
-            let floor = new THREE.Mesh(new THREE.PlaneGeometry(50, 50), new THREE.MeshStandardMaterial({color: 0x111}));
-            floor.rotation.x = -Math.PI/2;
-            scene.add(floor);
+// Outer walls
+wall(0,-21,42,1);
+wall(0,21,42,1);
+wall(-21,0,1,42);
+wall(21,0,1,42);
 
-            let wallMat = new THREE.MeshStandardMaterial({color: 0x444857});
-            [
-              [50, 4, 1, 0, 2, -25], [50, 4, 1, 0, 2, 25],
-              [1, 4, 50, -25, 2, 0], [1, 4, 50, 25, 2, 0]
-            ].forEach(w => {
-                let mesh = new THREE.Mesh(new THREE.BoxGeometry(w[0], w[1], w[2]), wallMat);
-                mesh.position.set(w[3], w[4], w[5]);
-                scene.add(mesh);
-            });
+// Interior maze. Gaps connect the corridors.
+wall(-12,-12,14,0.7);
+wall(9,-12,15,0.7);
+wall(-7,-5,0.7,11);
+wall(5,-5,0.7,11);
+wall(-12,3,12,0.7);
+wall(12,3,12,0.7);
+wall(-12,11,0.7,9);
+wall(12,12,0.7,8);
+wall(0,16,15,0.7);
+wall(0,-18,0.7,5);
+wall(-17,0,0.7,8);
+wall(17,-4,0.7,10);
+wall(0,7,0.7,5);
 
-            // Quái vật
-            monster = new THREE.Mesh(new THREE.BoxGeometry(1, 2, 1), new THREE.MeshStandardMaterial({color: 0xff0000, emissive: 0x400}));
-            monster.position.set(15, 1, 15);
-            scene.add(monster);
+// Ceiling lights
+for (let x=-16; x<=16; x+=8) {
+    for (let z=-16; z<=16; z+=8) {
+        const lamp = new THREE.Mesh(
+            new THREE.BoxGeometry(2.1,0.09,0.6),
+            new THREE.MeshBasicMaterial({color:0xd8edff})
+        );
+        lamp.position.set(x,4.8,z);
+        scene.add(lamp);
+    }
+}
 
-            // Chìa khóa
-            [[-20, -20], [20, -20], [-20, 20]].forEach(p => {
-                let k = new THREE.Mesh(new THREE.OctahedronGeometry(0.5), new THREE.MeshStandardMaterial({color: 0xffd700, emissive: 0x55400}));
-                k.position.set(p[0], 1, p[1]);
-                scene.add(k);
-                keyObjects.push(k);
-            });
+// Generic meme face texture for the chaser.
+const faceCanvas = document.createElement('canvas');
+faceCanvas.width=512;
+faceCanvas.height=512;
+const ctx=faceCanvas.getContext('2d');
+ctx.fillStyle='#f3e9d7';
+ctx.fillRect(0,0,512,512);
+ctx.fillStyle='#171717';
+ctx.beginPath();
+ctx.ellipse(155,190,45,70,0,0,Math.PI*2);
+ctx.ellipse(355,190,45,70,0,0,Math.PI*2);
+ctx.fill();
+ctx.fillStyle='#fff';
+ctx.beginPath();
+ctx.arc(165,175,12,0,Math.PI*2);
+ctx.arc(365,175,12,0,Math.PI*2);
+ctx.fill();
+ctx.strokeStyle='#171717';
+ctx.lineWidth=28;
+ctx.beginPath();
+ctx.moveTo(120,325);
+ctx.quadraticCurveTo(250,440,390,325);
+ctx.stroke();
+ctx.fillStyle='#b72e36';
+ctx.fillRect(205,355,100,23);
+const faceTexture = new THREE.CanvasTexture(faceCanvas);
+faceTexture.encoding=THREE.sRGBEncoding;
 
-            window.addEventListener('resize', () => {
-                camera.aspect = window.innerWidth / window.innerHeight;
-                camera.updateProjectionMatrix();
-                renderer.setSize(window.innerWidth, window.innerHeight);
-            });
+const enemy = new THREE.Group();
+const face = new THREE.Mesh(
+    new THREE.PlaneGeometry(2.3,2.3),
+    new THREE.MeshBasicMaterial({
+        map:faceTexture, side:THREE.DoubleSide
+    })
+);
+face.position.y=1.65;
+enemy.add(face);
+const body = new THREE.Mesh(
+    new THREE.BoxGeometry(1.7,2.6,0.65),
+    new THREE.MeshStandardMaterial({
+        color:0x1c111c, roughness:0.8
+    })
+);
+body.position.y=0.9;
+enemy.add(body);
+scene.add(enemy);
+
+// Collectible glowing orbs
+let orbs=[];
+function createOrbs() {
+    for(const o of orbs) scene.remove(o.mesh);
+    orbs=[];
+    const positions=[
+        [-16,-16],[-5,-16],[14,-17],[16,0],
+        [-15,7],[-4,4],[8,8],[3,17],
+        [-17,16],[15,15],[0,-7],[8,-5]
+    ];
+    for(const [x,z] of positions) {
+        const mesh=new THREE.Mesh(
+            new THREE.IcosahedronGeometry(0.32,1),
+            new THREE.MeshStandardMaterial({
+                color:0x55eaff, emissive:0x00aaff,
+                emissiveIntensity:2.4, metalness:0.2,
+                roughness:0.25
+            })
+        );
+        mesh.position.set(x,1,z);
+        scene.add(mesh);
+        orbs.push({mesh,x,z,active:true});
+    }
+}
+
+const keys={};
+let yaw=0, pitch=0, score=0, stamina=100;
+let running=false, playing=false, ended=false, elapsed=0;
+const clock=new THREE.Clock();
+
+function blocked(x,z) {
+    const r=0.48;
+    if(Math.abs(x)>19.9 || Math.abs(z)>19.9) return true;
+    return obstacles.some(o =>
+        x+r>o.x-o.w/2 && x-r<o.x+o.w/2 &&
+        z+r>o.z-o.d/2 && z-r<o.z+o.d/2
+    );
+}
+
+function reset() {
+    score=0; stamina=100; elapsed=0;
+    yaw=0; pitch=0;
+    camera.position.set(0,1.7,12);
+    enemy.position.set(-16,0,-16);
+    createOrbs();
+    scoreEl.textContent='0';
+    barEl.style.width='100%';
+    statusEl.textContent='THREAT: LOW';
+    messageEl.textContent='';
+    ended=false;
+}
+
+function finish(won) {
+    playing=false;
+    ended=true;
+    if(document.pointerLockElement) document.exitPointerLock();
+    overlay.style.display='flex';
+    document.getElementById('title').textContent=
+        won ? 'YOU SURVIVED!' : 'YOU GOT CAUGHT';
+    document.getElementById('subtitle').textContent=
+        won ? 'THE MALL IS QUIET... FOR NOW.' :
+        'THE NEXTBOT FOUND YOU.';
+    startBtn.textContent='PLAY AGAIN';
+}
+
+startBtn.addEventListener('click', () => {
+    if(!ended) reset();
+    overlay.style.display='none';
+    renderer.domElement.requestPointerLock();
+});
+
+document.addEventListener('pointerlockchange', () => {
+    if(document.pointerLockElement===renderer.domElement) {
+        playing=true;
+        clock.getDelta();
+    } else {
+        if(playing) {
+            playing=false;
+            overlay.style.display='flex';
+            document.getElementById('title').textContent='PAUSED';
+            document.getElementById('subtitle').textContent=
+                'CLICK ENTER TO CONTINUE';
+            startBtn.textContent='RESUME';
         }
+    }
+});
 
-        function animate() {
-            requestAnimationFrame(animate);
-            if (isOver || isWon) return;
+document.addEventListener('mousemove', e => {
+    if(!playing) return;
+    yaw-=e.movementX*0.0022;
+    pitch-=e.movementY*0.0022;
+    pitch=Math.max(-1.45,Math.min(1.45,pitch));
+});
 
-            let time = performance.now();
-            let delta = (time - prevTime) / 1000;
+document.addEventListener('keydown', e => {
+    keys[e.code]=true;
+    if(['Space','ArrowUp','ArrowDown','ArrowLeft','ArrowRight'].includes(e.code))
+        e.preventDefault();
+});
+document.addEventListener('keyup',e=>keys[e.code]=false);
 
-            velocity.x -= velocity.x * 10.0 * delta;
-            velocity.z -= velocity.z * 10.0 * delta;
+function update(dt) {
+    elapsed+=dt;
+    camera.rotation.set(pitch,yaw,0,'YXZ');
 
-            direction.z = Number(moveF) - Number(moveB);
-            direction.x = Number(moveR) - Number(moveL);
-            direction.normalize();
+    const forward=new THREE.Vector3(-Math.sin(yaw),0,-Math.cos(yaw));
+    const right=new THREE.Vector3(Math.cos(yaw),0,-Math.sin(yaw));
+    const move=new THREE.Vector3();
 
-            if (moveF || moveB) velocity.z -= direction.z * 35.0 * delta;
-            if (moveL || moveR) velocity.x -= direction.x * 35.0 * delta;
+    if(keys.KeyW) move.add(forward);
+    if(keys.KeyS) move.sub(forward);
+    if(keys.KeyD) move.add(right);
+    if(keys.KeyA) move.sub(right);
 
-            camera.translateX(-velocity.x * delta);
-            camera.translateZ(-velocity.z * delta);
-            camera.position.x = Math.max(-23, Math.min(23, camera.position.x));
-            camera.position.z = Math.max(-23, Math.min(23, camera.position.z));
+    const sprint=(keys.ShiftLeft||keys.ShiftRight) &&
+                 stamina>0 && move.lengthSq()>0;
+    if(sprint) stamina=Math.max(0,stamina-30*dt);
+    else stamina=Math.min(100,stamina+18*dt);
+    barEl.style.width=stamina+'%';
 
-            // Quái vật đuổi theo
-            let mDir = new THREE.Vector3().subVectors(camera.position, monster.position);
-            mDir.y = 0;
-            mDir.normalize();
-            monster.position.add
+    if(move.lengthSq()>0) {
+        move.normalize().multiplyScalar((sprint?7.8:4.3)*dt);
+        const p=camera.position;
+        if(!blocked(p.x+move.x,p.z)) p.x+=move.x;
+        if(!blocked(p.x,p.z+move.z)) p.z+=move.z;
+    }
+
+    // The bot pursues directly and may need to go around walls.
+    const dx=camera.position.x-enemy.position.x;
+    const dz=camera.position.z-enemy.position.z;
+    const dist=Math.hypot(dx,dz);
+    const speed=2.0+Math.min(score*0.12,1.4)+
+                Math.min(elapsed*0.012,0.9);
+    if(dist>0.001) {
+        const stepX=dx/dist*speed*dt;
+        const stepZ=dz/dist*speed*dt;
+        if(!blocked(enemy.position.x+stepX,enemy.position.z))
+            enemy.position.x+=stepX;
+        if(!blocked(enemy.position.x,enemy.position.z+stepZ))
+            enemy.position.z+=stepZ;
+    }
+
+    face.lookAt(camera.position.x,face.position.y,camera.position.z);
+    enemy.position.y=0.06*Math.sin(elapsed*5);
+    enemy.rotation.y=Math.atan2(
+        camera.position.x-enemy.position.x,
+        camera.position.z-enemy.position.z
+    );
+
+    statusEl.textContent=dist<7?'THREAT: HIGH':
+                         dist<13?'THREAT: MEDIUM':'THREAT: LOW';
+    if(dist<7) messageEl.textContent='RUN!';
+    else messageEl.textContent='';
+
+    for(const o of orbs) {
+        if(!o.active) continue;
+        o.mesh.rotation.y+=dt*1.8;
+        o.mesh.position.y=1+Math.sin(elapsed*2+o.x)*0.15;
+        if(Math.hypot(camera.position.x-o.x,camera.position.z-o.z)<1.25) {
+            o.active=false;
+            scene.remove(o.mesh);
+            score++;
+            scoreEl.textContent=score;
+        }
+    }
+
+    if(dist<1.65) finish(false);
+    if(score===orbs.length) finish(true);
+}
+
+function animate() {
+    requestAnimationFrame(animate);
+    const dt=Math.min(clock.getDelta(),0.05);
+    if(playing) update(dt);
+    renderer.render(scene,camera);
+}
+animate();
+
+window.addEventListener('resize',()=>{
+    camera.aspect=root.clientWidth/root.clientHeight;
+    camera.updateProjectionMatrix();
+    renderer.setSize(root.clientWidth,root.clientHeight);
+});
+})();
+</script>
+</body>
+</html>
+"""
+
+components.html(game_html, height=690, scrolling=False)
