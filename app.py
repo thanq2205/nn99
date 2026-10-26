@@ -1,233 +1,312 @@
 import streamlit as st
-import streamlit.components.v1 as components
 
-# Cấu hình trang Streamlit
-st.set_page_config(page_title="Verity Escape 3D", layout="wide")
+st.set_page_config(
+    page_title="School Escape 3D - Truy Đuổi Trong Trường Học",
+    page_icon="🏃‍♂️",
+    layout="wide",
+)
 
-st.title("🏫 Dự án Tin Học: VERITY ESCAPE (3D)")
-st.caption("Thành viên: Đỗ Nhật Minh, Trương Thị Ngọc Ngân, Nguyễn Quỳnh Trâm, Nguyễn Thái Dương, Nguyễn Hữu Tân.")
+# Ẩn header/footer mặc định của Streamlit để giao diện giống game hơn
+hide_streamlit_style = """
+    <style>
+    #MainMenu {visibility: hidden;}
+    footer {visibility: hidden;}
+    header {visibility: hidden;}
+    .block-container {padding-top: 1rem; padding-bottom: 0rem; padding-left: 1rem; padding-right: 1rem;}
+    </style>
+"""
+st.markdown(hide_streamlit_style, unsafe_allow_html=True)
 
-# Mô tả luật chơi bằng giao diện Streamlit
-with st.sidebar:
-    st.header("🎮 Hướng dẫn chơi")
-    st.markdown("""
-    - **Di chuyển**: Dùng các phím **W, A, S, D** trên bàn phím.
-    - **Xoay góc nhìn**: Dùng phím mũi tên **Trái (←) / Phải (→)**.
-    - **Nhiệm vụ**: Tìm bức tranh manh mối trong mê cung trường học, giải mã ô chữ và **nhập đáp án vào hộp thoại trực tiếp trong game**.
-    - **Thử thách**: Tránh xa quái vật **Verity** đang đuổi theo bạn!
-    - **Giới hạn**: Bạn có **3 tim** và **2 phút** cho mỗi màn (Tổng cộng: 6 màn).
-    """)
-    st.info("Nhấp chuột vào khung màn hình game để bắt đầu điều khiển.")
+st.title("🏫 School Escape 3D: Night Chase")
+st.markdown(
+    "**Nhiệm vụ:** Tìm **3 chiếc chìa khóa** màu vàng ẩn giấu trong các hành lang trường học và chạy trốn khỏi con quái vật đang truy đuổi! Tránh xa màu đỏ."
+)
 
-# Mã nguồn HTML5 + CSS + JS cho Game 3D Raycasting
+# Mã HTML + Three.js nhúng vào Streamlit
 game_html = """
 <!DOCTYPE html>
-<html>
+<html lang="vi">
 <head>
     <meta charset="UTF-8">
+    <title>School Escape 3D</title>
     <style>
-        body { margin: 0; padding: 0; background-color: #111; font-family: sans-serif; color: white; overflow: hidden; }
-        #game-container { position: relative; width: 800px; height: 500px; margin: 10px auto; border: 4px solid #333; background: #000; }
-        canvas { display: block; width: 100%; height: 100%; }
-        #ui-overlay { position: absolute; top: 10px; left: 10px; font-size: 16px; text-shadow: 2px 2px black; z-index: 10; }
-        #puzzle-box { position: absolute; bottom: 20px; left: 50%; transform: translateX(-50%); background: rgba(0,0,0,0.8); padding: 15px; border: 2px solid #555; border-radius: 8px; text-align: center; display: none; z-index: 10; width: 300px; }
-        #puzzle-box input { padding: 5px; width: 150px; font-size: 16px; text-align: center; text-transform: uppercase; }
-        #puzzle-box button { padding: 5px 10px; font-size: 16px; cursor: pointer; margin-left: 5px; }
-        #screen-msg { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); font-size: 32px; text-align: center; text-shadow: 3px 3px black; font-weight: bold; z-index: 20; width: 100%; }
+        body { margin: 0; overflow: hidden; background: #000; font-family: monospace; user-select: none; }
+        #ui {
+            position: absolute; top: 10px; left: 10px; color: white;
+            font-size: 18px; text-shadow: 2px 2px 4px #000; pointer-events: none;
+        }
+        #crosshair {
+            position: absolute; top: 50%; left: 50%; width: 10px; height: 10px;
+            transform: translate(-50%, -50%); border: 2px solid rgba(255,255,255,0.7);
+            border-radius: 50%; pointer-events: none;
+        }
+        #instruction {
+            position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
+            background: rgba(0,0,0,0.8); color: white; padding: 20px; text-align: center;
+            border-radius: 10px; border: 2px solid #fff; cursor: pointer;
+        }
+        #gameover {
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(100,0,0,0.85); color: white; display: none;
+            flex-direction: column; justify-content: center; align-items: center;
+            font-size: 32px; z-index: 10;
+        }
+        #win {
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,100,0,0.85); color: white; display: none;
+            flex-direction: column; justify-content: center; align-items: center;
+            font-size: 32px; z-index: 10;
+        }
+        .btn {
+            padding: 10px 20px; background: #ff4757; color: white; border: none;
+            font-size: 20px; border-radius: 5px; cursor: pointer; margin-top: 15px; font-weight: bold;
+        }
+        .btn:hover { background: #ff6b81; }
     </style>
 </head>
 <body>
-
-<div id="game-container">
-    <div id="ui-overlay">
-        <div>🎬 Màn: <span id="lbl-level">1</span>/6</div>
-        <div>❤️ Tim: <span id="lbl-lives">❤️❤️❤️</span></div>
-        <div>⏳ Thời gian: <span id="lbl-time">02:00</span></div>
+    <div id="ui">
+        Chìa khóa đã nhặt: <span id="keysCount">0</span>/3<br>
+        Trạng thái: <span id="status" style="color: yellow;">Tránh quái vật và tìm chìa khóa!</span>
     </div>
+    <div id="crosshair"></div>
     
-    <div id="screen-msg">BẤM VÀO ĐÂY ĐỂ CHƠI</div>
-    
-    <div id="puzzle-box">
-        <div style="margin-bottom: 8px; font-weight: bold; color: #ffeb3b;">🧩 ĐÃ TÌM THẤY TRANH MANH MỐI!</div>
-        <div id="puzzle-hint" style="font-size: 14px; margin-bottom: 10px; font-style: italic;"></div>
-        <input type="text" id="ans-input" placeholder="Nhập đáp án...">
-        <button onclick="checkAnswer()">Nộp</button>
-        <div id="wrong-count" style="font-size:12px; color:red; margin-top:5px;"></div>
+    <div id="instruction">
+        <h2>TRƯỜNG HỌC BỊ NGƯỀN RỦA</h2>
+        <p><b>W, A, S, D</b> để di chuyển | <b>Chuột</b> để xoay nhìn</p>
+        <p>Click vào đây để bắt đầu chơi!</p>
     </div>
 
-    <canvas id="gameCanvas" width="400" height="250"></canvas>
-</div>
+    <div id="gameover">
+        <h1>BẠN ĐÃ BỊ BẮT!</h1>
+        <p>Quái vật đã tóm được bạn trong bóng tối.</p>
+        <button class="btn" onclick="location.reload()">Chơi Lại</button>
+    </div>
 
-<script>
-const canvas = document.getElementById("gameCanvas");
-const ctx = canvas.getContext("2d");
+    <div id="win">
+        <h1>CHIẾN THẮNG!</h1>
+        <p>Bạn đã thu thập đủ chìa khóa và trốn thoát khỏi trường học!</p>
+        <button class="btn" onclick="location.reload()">Chơi Lại</button>
+    </div>
 
-// Ma trận mê cung trường học (1: Tường, 0: Đường đi, 3: Bức tranh mảnh ghép)
-const defaultMap = [,
- ,
- ,
- ,
- ,
- ,
-    [1,1,1,1,1,1,1,1]
-];
+    <!-- Tải Three.js từ CDN -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script>
+        let scene, camera, renderer;
+        let moveForward = false, moveBackward = false, moveLeft = false, moveRight = false;
+        let prevTime = performance.now();
+        let velocity = new THREE.Vector3();
+        let direction = new THREE.Vector3();
+        
+        let keysCollected = 0;
+        let totalKeys = 3;
+        let keyObjects = [];
+        let monster, monsterSpeed = 0.035;
+        let isGameOver = false;
+        let isGameWon = false;
 
-// Cấu hình danh sách 6 màn chơi gồm Gợi ý và Đáp án viết liền không dấu
-const levels = [
-    { map: defaultMap, px:1.5, py:1.5, hint: "Môn học nghiên cứu về máy tính (6 chữ cái, viết liền không dấu)", ans: "TINHOC" },
-    { map: defaultMap, px:1.5, py:1.5, hint: "Nơi học sinh đến học mỗi ngày (9 chữ cái, viết liền không dấu)", ans: "TRUONGHOC" },
-    { map: defaultMap, px:1.5, py:1.5, hint: "Thiết bị dùng để gõ văn bản, lướt web (7 chữ cái, viết liền không dấu)", ans: "MAYTINH" },
-    { map: defaultMap, px:1.5, py:1.5, hint: "Thầy cô truyền đạt kiến thức qua mỗi... (6 chữ cái, viết liền không dấu)", ans: "BAIHOC" },
-    { map: defaultMap, px:1.5, py:1.5, hint: "Đồ vật luôn nằm trong cặp sách học sinh (6 chữ cái, viết liền không dấu)", ans: "SACHVO" },
-    { map: defaultMap, px:1.5, py:3.5, hint: "Tên hành động thoát khỏi căn phòng bí ẩn (6 chữ cái, Tiếng Anh)", ans: "ESCAPE" }
-];
+        const blocker = document.getElementById('instruction');
 
-let currentLevelIdx = 0;
-let map = levels[currentLevelIdx].map;
-let player = { x: 1.5, y: 1.5, angle: 0, lives: 3, wrongAnswers: 0 };
-let monster = { x: 5.5, y: 5.5, speed: 0.015 };
-let keys = {};
-let gameActive = false;
-let timeLeft = 120;
-let timerInterval;
+        blocker.addEventListener('click', function () {
+            document.body.requestPointerLock();
+        });
 
-window.addEventListener("keydown", e => { keys[e.key.toLowerCase()] = true; });
-window.addEventListener("keyup", e => { keys[e.key.toLowerCase()] = false; });
-
-document.getElementById("game-container").addEventListener("click", () => {
-    if(!gameActive && player.lives > 0 && currentLevelIdx < 6) {
-        gameActive = true;
-        document.getElementById("screen-msg").style.display = "none";
-        startTimer();
-    }
-});
-
-function startTimer() {
-    clearInterval(timerInterval);
-    timerInterval = setInterval(() => {
-        if(!gameActive) return;
-        timeLeft--;
-        let mins = Math.floor(timeLeft / 60).toString().padStart(2, '0');
-        let secs = (timeLeft % 60).toString().padStart(2, '0');
-        document.getElementById("lbl-time").innerText = mins + ":" + secs;
-        if(timeLeft <= 0) {
-            endGame(false, "HẾT THỜI GIAN!");
-        }
-    }, 1000);
-}
-
-function loadLevel(idx) {
-    if(idx >= levels.length) {
-        endGame(true, "🎉 CHÚC MỪNG NHÓM BẠN ĐÃ CHIẾN THẮNG!");
-        return;
-    }
-    currentLevelIdx = idx;
-    map = levels[currentLevelIdx].map;
-    player.x = levels[currentLevelIdx].px;
-    player.y = levels[currentLevelIdx].py;
-    player.angle = 0;
-    player.wrongAnswers = 0;
-    
-    monster.x = 5.5; monster.y = 5.5;
-    monster.speed = 0.012 + (idx * 0.003); 
-    timeLeft = Math.max(120 - (idx * 10), 60); 
-    
-    document.getElementById("lbl-level").innerText = currentLevelIdx + 1;
-    document.getElementById("puzzle-box").style.display = "none";
-    document.getElementById("wrong-count").innerText = "";
-}
-
-function checkAnswer() {
-    let input = document.getElementById("ans-input").value.trim().toUpperCase();
-    if(input === levels[currentLevelIdx].ans) {
-        document.getElementById("ans-input").value = "";
-        loadLevel(currentLevelIdx + 1);
-    } else {
-        player.wrongAnswers++;
-        document.getElementById("wrong-count").innerText = "Sai lần " + player.wrongAnswers + "/3";
-        if(player.wrongAnswers >= 3) {
-            player.lives--;
-            player.wrongAnswers = 0;
-            updateLivesUI();
-            if(player.lives <= 0) {
-                endGame(false, "☠️ BẠN ĐÃ HẾT TIM!");
+        document.addEventListener('pointerlockchange', function () {
+            if (document.pointerLockElement === document.body) {
+                blocker.style.display = 'none';
             } else {
-                alert("Giải sai 3 lần! Bạn mất 1 tim. Hệ thống đưa bạn quay lại màn 1.");
-                loadLevel(0); 
+                if (!isGameOver && !isGameWon) blocker.style.display = 'block';
             }
+        });
+
+        document.addEventListener('mousemove', (event) => {
+            if (document.pointerLockElement !== document.body) return;
+            let movementX = event.movementX || event.mozMovementX || event.webkitMovementX || 0;
+            camera.rotation.y -= movementX * 0.002;
+        });
+
+        const keyboardState = {};
+        window.addEventListener('keydown', (e) => {
+            keyboardState[e.code] = true;
+            if (e.code === 'KeyW') moveForward = true;
+            if (e.code === 'KeyS') moveBackward = true;
+            if (e.code === 'KeyA') moveLeft = true;
+            if (e.code === 'KeyD') moveRight = true;
+        });
+        window.addEventListener('keyup', (e) => {
+            keyboardState[e.code] = false;
+            if (e.code === 'KeyW') moveForward = false;
+            if (e.code === 'KeyS') moveBackward = false;
+            if (e.code === 'KeyA') moveLeft = false;
+            if (e.code === 'KeyD') moveRight = false;
+        });
+
+        init();
+        animate();
+
+        function init() {
+            scene = new THREE.Scene();
+            scene.background = new THREE.Color(0x050505);
+            scene.fog = new THREE.FogExp2(0x050505, 0.08);
+
+            camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+            camera.position.set(0, 1.6, 5);
+
+            renderer = new THREE.WebGLRenderer({ antialias: true });
+            renderer.setSize(window.innerWidth, window.innerHeight);
+            renderer.shadowMap.enabled = true;
+            document.body.appendChild(renderer.domElement);
+
+            // Ánh sáng mờ ảo phong cách kinh dị
+            const ambientLight = new THREE.AmbientLight(0x222233);
+            scene.add(ambientLight);
+
+            const pointLight = new THREE.PointLight(0xffaa44, 1.5, 15);
+            camera.add(pointLight);
+            scene.add(camera);
+
+            // Tạo bản đồ trường học (Hành lang lớp học đơn giản)
+            createSchoolMap();
+
+            // Tạo quái vật truy đuổi
+            createMonster();
+
+            // Tạo các chìa khóa ngẫu nhiên
+            spawnKeys();
+
+            window.addEventListener('resize', onWindowResize);
         }
-    }
-}
 
-function updateLivesUI() {
-    let hearts = "";
-    for(let i=0; i<3; i++) hearts += i < player.lives ? "❤️" : "🖤";
-    document.getElementById("lbl-lives").innerText = hearts;
-}
+        function createSchoolMap() {
+            // Sàn nhà
+            const floorGeo = new THREE.PlaneGeometry(60, 60);
+            const floorMat = new THREE.MeshStandardMaterial({ color: 0x1a1a1a, roughness: 0.8 });
+            const floor = new THREE.Mesh(floorGeo, floorMat);
+            floor.rotation.x = -Math.PI / 2;
+            scene.add(floor);
 
-function endGame(victory, msg) {
-    gameActive = false;
-    clearInterval(timerInterval);
-    const screenMsg = document.getElementById("screen-msg");
-    screenMsg.innerHTML = msg + "<br><span style='font-size:16px;'>Nhấn F5 (Tải lại trang) để chơi lại</span>";
-    screenMsg.style.display = "block";
-}
+            // Trần nhà
+            const ceiling = new THREE.Mesh(floorGeo, floorMat);
+            ceiling.rotation.x = Math.PI / 2;
+            ceiling.position.y = 4;
+            scene.add(ceiling);
 
-function updateAndRender() {
-    if(gameActive) {
-        let moveSpeed = 0.04;
-        let rotSpeed = 0.04;
-        let newX = player.x;
-        let newY = player.y;
+            // Tường hành lang & phòng học (Mê cung đơn giản)
+            const wallMat = new THREE.MeshStandardMaterial({ color: 0x4a5568, roughness: 0.5 });
+            
+            const walls = [
+                {w: 60, h: 4, d: 1, x: 0, y: 2, z: -30},
+                {w: 60, h: 4, d: 1, x: 0, y: 2, z: 30},
+                {w: 1, h: 4, d: 60, x: -30, y: 2, z: 0},
+                {w: 1, h: 4, d: 60, x: 30, y: 2, z: 0},
+                // Các vách ngăn hành lang trường học bên trong
+                {w: 20, h: 4, d: 1, x: -10, y: 2, z: -10},
+                {w: 20, h: 4, d: 1, x: 10, y: 2, z: -10},
+                {w: 1, h: 4, d: 20, x: -15, y: 2, z: 10},
+                {w: 20, h: 4, d: 1, x: 10, y: 2, z: 15},
+            ];
 
-        if (keys["w"]) { newX += Math.cos(player.angle) * moveSpeed; newY += Math.sin(player.angle) * moveSpeed; }
-        if (keys["s"]) { newX -= Math.cos(player.angle) * moveSpeed; newY -= Math.sin(player.angle) * moveSpeed; }
-        if (keys["a"]) { newX += Math.sin(player.angle) * moveSpeed; newY -= Math.cos(player.angle) * moveSpeed; }
-        if (keys["d"]) { newX -= Math.sin(player.angle) * moveSpeed; newY += Math.cos(player.angle) * moveSpeed; }
-        if (keys["arrowleft"]) player.angle -= rotSpeed;
-        if (keys["arrowright"]) player.angle += rotSpeed;
+            walls.forEach(data => {
+                const wallGeo = new THREE.BoxGeometry(data.w, data.h, data.d);
+                const wall = new THREE.Mesh(wallGeo, wallMat);
+                wall.position.set(data.x, data.y, data.z);
+                scene.add(wall);
+            });
+        }
 
-        if (map[Math.floor(player.y)][Math.floor(newX)] !== 1) player.x = newX;
-        if (map[Math.floor(newY)][Math.floor(player.x)] !== 1) player.y = newY;
+        function createMonster() {
+            const monsterGeo = new THREE.BoxGeometry(1, 2.2, 1);
+            const monsterMat = new THREE.MeshStandardMaterial({ color: 0xff0000, emissive: 0x550000 });
+            monster = new THREE.Mesh(monsterGeo, monsterMat);
+            monster.position.set(20, 1.1, 20);
+            scene.add(monster);
+        }
 
-        let dx = player.x - monster.x;
-        let dy = player.y - monster.y;
-        let dist = Math.sqrt(dx*dx + dy*dy);
-        if(dist > 0.3) {
-            monster.x += (dx / dist) * monster.speed;
-            monster.y += (dy / dist) * monster.speed;
-        } else {
-            player.lives--;
-            updateLivesUI();
-            if(player.lives <= 0) {
-                endGame(false, "👻 VERITY ĐÃ BẮT ĐƯỢC BẠN!");
-            } else {
-                alert("Bạn bị Verity bắt! Mất 1 tim. Hệ thống đưa bạn quay lại màn 1.");
-                loadLevel(0);
+        function spawnKeys() {
+            const keyPositions = [
+                {x: -25, z: -25},
+                {x: 25, z: -25},
+                {x: -25, z: 25}
+            ];
+
+            keyPositions.forEach(pos => {
+                const keyGeo = new THREE.OctahedronGeometry(0.5);
+                const keyMat = new THREE.MeshStandardMaterial({ color: 0xffd700, emissive: 0xffaa00 });
+                const keyMesh = new THREE.Mesh(keyGeo, keyMat);
+                keyMesh.position.set(pos.x, 1, pos.z);
+                scene.add(keyMesh);
+                keyObjects.push(keyMesh);
+            });
+        }
+
+        function onWindowResize() {
+            camera.aspect = window.innerWidth / window.innerHeight;
+            camera.updateProjectionMatrix();
+            renderer.setSize(window.innerWidth, window.innerHeight);
+        }
+
+        function animate() {
+            requestAnimationFrame(animate);
+
+            if (isGameOver || isGameWon) return;
+
+            const time = performance.now();
+            const delta = (time - prevTime) / 1000;
+
+            // Di chuyển người chơi
+            velocity.x -= velocity.x * 10.0 * delta;
+            velocity.z -= velocity.z * 10.0 * delta;
+
+            direction.z = Number(moveForward) - Number(moveBackward);
+            direction.x = Number(moveRight) - Number(moveLeft);
+            direction.normalize();
+
+            if (moveForward || moveBackward) velocity.z -= direction.z * 40.0 * delta;
+            if (moveLeft || moveRight) velocity.x -= direction.x * 40.0 * delta;
+
+            camera.translateX(-velocity.x * delta);
+            camera.translateZ(-velocity.z * delta);
+
+            // Giới hạn biên độ bản đồ trường học
+            camera.position.x = Math.max(-28, Math.min(28, camera.position.x));
+            camera.position.z = Math.max(-28, Math.min(28, camera.position.z));
+
+            // AI Quái vật truy đuổi người chơi
+            const monsterDir = new THREE.Vector3().subVectors(camera.position, monster.position);
+            monsterDir.y = 0;
+            monsterDir.normalize();
+            monster.position.addScaledVector(monsterDir, monsterSpeed);
+
+            // Kiểm tra va chạm với quái vật (Game Over)
+            if (monster.position.distanceTo(camera.position) < 1.2) {
+                isGameOver = true;
+                document.getElementById('gameover').style.display = 'flex';
+                document.exitPointerLock();
             }
+
+            // Kiểm tra nhặt chìa khóa
+            keyObjects.forEach((kMesh, index) => {
+                kMesh.rotation.y += 0.05;
+                if (kMesh.visible && camera.position.distanceTo(kMesh.position) < 1.5) {
+                    kMesh.visible = false;
+                    keysCollected++;
+                    document.getElementById('keysCount').innerText = keysCollected;
+                    
+                    if (keysCollected >= totalKeys) {
+                        isGameWon = true;
+                        document.getElementById('win').style.display = 'flex';
+                        document.exitPointerLock();
+                    }
+                }
+            });
+
+            prevTime = time;
+            renderer.render(scene, camera);
         }
+    </script>
+</body>
+</html>
+"""
 
-        if(map[Math.floor(player.y)][Math.floor(player.x)] === 3) {
-            document.getElementById("puzzle-hint").innerText = levels[currentLevelIdx].hint;
-            document.getElementById("puzzle-box").style.display = "block";
-        } else {
-            document.getElementById("puzzle-box").style.display = "none";
-        }
-    }
-
-    ctx.fillStyle = "#222"; ctx.fillRect(0, 0, canvas.width, canvas.height/2);
-    ctx.fillStyle = "#444"; ctx.fillRect(0, canvas.height/2, canvas.width, canvas.height/2);
-
-    const fov = Math.PI / 3;
-    const numRays = canvas.width;
-    for (let i = 0; i < numRays; i++) {
-        let rayAngle = (player.angle - fov/2) + (i / numRays) * fov;
-        let distance = 0;
-        let hitWall = false;
-        let wallType = 0;
-
-        while (!hitWall && distance < 16) {
-            distance += 0.05;
-            let checkX = Math.floor(player.x + Math.cos(rayAngle) * distance);
-            let checkY = Math.floor(player.y + Math.sin(rayAngle) * distance);
-
+# Hiển thị game bên trong Streamlit thông qua iframe component
+st.components.v1.html(game_html, height=600, scrolling=False)
