@@ -1,365 +1,447 @@
 import streamlit as st
 import streamlit.components.v1 as components
 
-st.set_page_config(
-    page_title="NEXTBOT 3D",
-    page_icon="👁️",
-    layout="wide",
-    initial_sidebar_state="collapsed",
-)
+st.set_page_config(page_title="NEXTBOT ESCAPE", page_icon="👁️", layout="wide")
 
 st.markdown("""
 <style>
-    html, body, [data-testid="stAppViewContainer"] {
-        background: #080b10;
-        color: #f3f6fb;
-    }
-    header, footer, #MainMenu { visibility: hidden; }
-    .block-container { padding: 0.8rem 0.8rem 0; max-width: 1500px; }
-    h1 { text-align: center; color: #ff4545; margin-bottom: 0; }
-    [data-testid="stCaptionContainer"] { text-align: center; }
+html,body,[data-testid="stAppViewContainer"]{background:#07090d;color:white}
+[data-testid="stHeader"],footer{visibility:hidden}
+.block-container{padding:1rem;max-width:1600px}
+h1{text-align:center;color:#ff3b57;letter-spacing:5px}
 </style>
+<h1>NEXTBOT ESCAPE</h1>
+<p style="text-align:center;color:#aaa">THU THẬP 8 PIN • TRÁNH NEXTBOT • TÌM CỬA THOÁT</p>
 """, unsafe_allow_html=True)
 
-st.markdown("# 👁️ NEXTBOT 3D")
-st.caption("SURVIVE THE MALL • COLLECT ORBS • DON'T GET CAUGHT")
+game = r"""
+<div id="wrap" style="position:relative;width:100%;height:78vh;min-height:520px;background:#05070a;overflow:hidden;border-radius:10px">
+<canvas id="game" style="width:100%;height:100%;display:block"></canvas>
 
-game_html = r"""
-<!doctype html>
-<html lang="vi">
-<head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<style>
-*{box-sizing:border-box}
-html,body{margin:0;width:100%;height:100%;overflow:hidden;background:#07090e;color:#fff;font-family:Arial,sans-serif}
-#game{position:relative;width:100%;height:690px;overflow:hidden;background:#07090e}
-canvas{display:block;width:100%;height:100%}
-#hud{position:absolute;inset:0;pointer-events:none;text-shadow:0 2px 5px #000}
-#top{display:flex;justify-content:space-between;padding:16px 18px;font-size:16px;font-weight:700}
-#crosshair{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);font-size:22px}
-#message{position:absolute;left:0;right:0;top:39%;text-align:center;color:#ff4c55;font-size:24px;font-weight:900}
-#bottom{position:absolute;bottom:20px;left:50%;transform:translateX(-50%);width:210px;text-align:center;font-size:11px;color:#dce6f4}
-#stamina{height:8px;background:#303744;border-radius:8px;overflow:hidden;margin-top:5px}
-#bar{height:100%;width:100%;background:#54dcff;transition:width .08s}
-#overlay{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;background:rgba(2,4,8,.82);text-align:center}
-.panel{max-width:480px;padding:24px}
-h2{font-size:42px;color:#ff424e;margin:0 0 8px}
-small{color:#c2cad8;line-height:1.9}
-button{border:0;border-radius:8px;padding:13px 24px;background:#e72d40;color:white;font-size:16px;font-weight:bold;cursor:pointer;margin-top:18px}
-#toast{position:absolute;left:0;right:0;bottom:62px;text-align:center;color:#72edff;font-weight:bold}
-@media(max-width:600px){#game{height:620px}h2{font-size:32px}}
-</style>
-</head>
-<body>
-<div id="game">
-  <div id="hud">
-    <div id="top"><div>ORB: <span id="score">0</span>/10</div><div id="threat">THREAT: LOW</div></div>
-    <div id="crosshair">+</div>
-    <div id="message"></div>
-    <div id="toast"></div>
-    <div id="bottom">STAMINA<div id="stamina"><div id="bar"></div></div></div>
-  </div>
-  <div id="overlay">
-    <div class="panel">
-      <h2 id="title">NEXTBOT 3D</h2>
-      <div id="subtitle">LOST MALL — SURVIVE IF YOU CAN</div>
-      <p><small>W A S D — Di chuyển<br>SHIFT — Chạy nhanh<br>CHUỘT — Nhìn xung quanh<br>Thu thập 10 orb và tránh Nextbot.</small></p>
-      <button id="start">BẮT ĐẦU</button>
-      <p><small>Game prototype • Three.js</small></p>
-    </div>
-  </div>
+<div style="position:absolute;top:15px;left:15px;color:white;font: bold 15px Arial;background:#090d16cc;padding:12px;border-radius:8px">
+<div style="color:#ff405a">MISSION</div>
+<div id="count">PIN: 0 / 8</div>
+<div style="margin-top:8px">STAMINA</div>
+<div style="width:140px;height:7px;background:#333">
+<div id="stamina" style="height:100%;width:100%;background:#50e59a"></div>
 </div>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+</div>
+
+<div id="danger" style="position:absolute;top:18px;right:18px;color:#ff405a;font:bold 14px Arial"></div>
+<div id="message" style="position:absolute;top:20%;width:100%;text-align:center;color:white;font:bold 20px Arial"></div>
+<div style="position:absolute;top:50%;left:50%;color:white;pointer-events:none">+</div>
+
+<div id="overlay" style="position:absolute;inset:0;background:#05070ae8;display:flex;align-items:center;justify-content:center;text-align:center;color:white;font-family:Arial">
+<div>
+<div style="color:#ff405a;letter-spacing:5px">SURVIVE THE MAZE</div>
+<h1 id="title" style="font-size:45px">DON'T GET CAUGHT</h1>
+<p id="desc">Thu thập đủ 8 pin rồi tìm cửa thoát màu xanh.<br>Đừng để Nextbot bắt được!</p>
+<button id="start" style="padding:15px 35px;background:#ff304e;color:white;border:0;border-radius:6px;font-weight:bold;cursor:pointer">BẮT ĐẦU</button>
+<p style="color:#aaa;font-size:12px">WASD di chuyển • SHIFT chạy • Chuột nhìn</p>
+</div>
+</div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.min.js"></script>
 <script>
-(() => {
-const root = document.getElementById('game');
-const overlay = document.getElementById('overlay');
-const startButton = document.getElementById('start');
-const scoreNode = document.getElementById('score');
-const threatNode = document.getElementById('threat');
-const messageNode = document.getElementById('message');
-const toastNode = document.getElementById('toast');
-const staminaBar = document.getElementById('bar');
+(()=>{
+const canvas=document.getElementById('game');
+const overlay=document.getElementById('overlay');
+const countEl=document.getElementById('count');
+const staminaEl=document.getElementById('stamina');
+const message=document.getElementById('message');
+const danger=document.getElementById('danger');
 
-if (!window.THREE) {
-  document.getElementById('subtitle').textContent =
-    'Không tải được Three.js. Hãy kiểm tra kết nối Internet rồi tải lại trang.';
-  startButton.style.display = 'none';
-  return;
+let scene,camera,renderer,clock;
+let active=false,pins=0,stamina=100,yaw=0,pitch=0;
+const keys={},walls=[],pickups=[];
+const N=15,CELL=4,HALF=N*CELL/2;
+let player={x:-HALF+6,z:-HALF+6};
+let bot,exitObj;
+
+function rng(seed){
+ let s=seed;
+ return ()=>((s=(s*1664525+1013904223)>>>0)/4294967296);
+}
+const rand=rng(22);
+
+function material(color,emissive=0){
+ return new THREE.MeshStandardMaterial({
+  color,roughness:.9,emissive,emissiveIntensity:.8
+ });
 }
 
-const scene = new THREE.Scene();
-scene.background = new THREE.Color(0x080b12);
-scene.fog = new THREE.Fog(0x080b12, 10, 43);
-
-const camera = new THREE.PerspectiveCamera(76, 1, 0.1, 90);
-camera.rotation.order = 'YXZ';
-camera.position.set(0, 1.65, 13);
-
-const renderer = new THREE.WebGLRenderer({antialias:false, powerPreference:'low-power'});
-renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 1.35));
-renderer.outputEncoding = THREE.sRGBEncoding;
-renderer.setSize(root.clientWidth, root.clientHeight);
-root.insertBefore(renderer.domElement, root.firstChild);
-
-scene.add(new THREE.HemisphereLight(0xb8d7ff, 0x27202d, 1.15));
-const mainLight = new THREE.DirectionalLight(0xe1eaff, 0.65);
-mainLight.position.set(3, 8, 4);
-scene.add(mainLight);
-
-const floorMat = new THREE.MeshStandardMaterial({color:0x252a34, roughness:1});
-const wallMat = new THREE.MeshStandardMaterial({color:0x3d4350, roughness:1});
-const darkMat = new THREE.MeshStandardMaterial({color:0x171c25, roughness:1});
-const obstacles = [];
-
-function addBox(x,y,z,w,h,d,material,solid=true) {
-  const mesh = new THREE.Mesh(new THREE.BoxGeometry(w,h,d), material);
-  mesh.position.set(x,y,z);
-  scene.add(mesh);
-  if (solid) obstacles.push({x,z,w,d});
-  return mesh;
+function addWall(x,z,w,d){
+ const mesh=new THREE.Mesh(
+  new THREE.BoxGeometry(w,3.5,d),
+  material(0x222936)
+ );
+ mesh.position.set(x,1.75,z);
+ scene.add(mesh);
+ walls.push({x,z,w,d});
 }
 
-const floor = new THREE.Mesh(new THREE.PlaneGeometry(42,42), floorMat);
-floor.rotation.x = -Math.PI/2;
-scene.add(floor);
-const ceiling = new THREE.Mesh(new THREE.PlaneGeometry(42,42), darkMat);
-ceiling.rotation.x = Math.PI/2;
-ceiling.position.y = 4.8;
-scene.add(ceiling);
+function makeMaze(){
+ const floor=new THREE.Mesh(
+  new THREE.PlaneGeometry(N*CELL,N*CELL),
+  material(0x171c25)
+ );
+ floor.rotation.x=-Math.PI/2;
+ scene.add(floor);
 
-// Outer walls and a compact maze with broad gaps.
-addBox(0,2.4,-21,42,4.8,1,wallMat);
-addBox(0,2.4,21,42,4.8,1,wallMat);
-addBox(-21,2.4,0,1,4.8,42,wallMat);
-addBox(21,2.4,0,1,4.8,42,wallMat);
-addBox(-12,2.1,-12,14,4.2,.65,wallMat);
-addBox(9,2.1,-12,15,4.2,.65,wallMat);
-addBox(-7,2.1,-5,.65,4.2,11,wallMat);
-addBox(5,2.1,-5,.65,4.2,11,wallMat);
-addBox(-12,2.1,3,12,4.2,.65,wallMat);
-addBox(12,2.1,3,12,4.2,.65,wallMat);
-addBox(-12,2.1,11,.65,4.2,9,wallMat);
-addBox(12,2.1,12,.65,4.2,8,wallMat);
-addBox(0,2.1,16,15,4.2,.65,wallMat);
-addBox(0,2.1,-18,.65,4.2,5,wallMat);
-addBox(-17,2.1,0,.65,4.2,8,wallMat);
-addBox(17,2.1,-4,.65,4.2,10,wallMat);
+ const grid=Array.from({length:N},()=>Array(N).fill(0));
 
-// Ceiling panels: emissive materials, no extra dynamic lights.
-const lampMat = new THREE.MeshBasicMaterial({color:0xc9e8ff});
-for(let x=-16;x<=16;x+=8){
-  for(let z=-16;z<=16;z+=8){
-    addBox(x,4.72,z,2,.07,.55,lampMat,false);
+ for(let i=0;i<N;i++){
+  grid[0][i]=grid[N-1][i]=1;
+  grid[i][0]=grid[i][N-1]=1;
+ }
+
+ for(let z=2;z<N-2;z++){
+  for(let x=2;x<N-2;x++){
+   if(rand()<.22 && !(x<4&&z<4) && !(x>10&&z>10)){
+    grid[z][x]=1;
+   }
   }
-}
+ }
 
-// Draw a simple meme face locally; no external image assets needed.
-const fc = document.createElement('canvas');
-fc.width = fc.height = 256;
-const cx = fc.getContext('2d');
-cx.fillStyle = '#f1e8d7'; cx.fillRect(0,0,256,256);
-cx.fillStyle = '#151515';
-cx.beginPath(); cx.ellipse(78,91,22,34,0,0,Math.PI*2); cx.ellipse(178,91,22,34,0,0,Math.PI*2); cx.fill();
-cx.fillStyle = '#fff';
-cx.beginPath(); cx.arc(83,84,6,0,Math.PI*2); cx.arc(183,84,6,0,Math.PI*2); cx.fill();
-cx.strokeStyle = '#171717'; cx.lineWidth = 14;
-cx.beginPath(); cx.moveTo(57,166); cx.quadraticCurveTo(128,226,202,166); cx.stroke();
-cx.fillStyle = '#ad2732'; cx.fillRect(100,184,56,12);
-const faceTexture = new THREE.CanvasTexture(fc);
-faceTexture.encoding = THREE.sRGBEncoding;
+ for(let x=1;x<N-1;x++){
+  grid[4][x]=0;
+  grid[9][x]=0;
+ }
 
-const bot = new THREE.Group();
-const botBody = new THREE.Mesh(
-  new THREE.BoxGeometry(1.45,2.25,.6),
-  new THREE.MeshStandardMaterial({color:0x171019,roughness:1})
-);
-botBody.position.y = 1.05;
-bot.add(botBody);
-const botFace = new THREE.Mesh(
-  new THREE.PlaneGeometry(1.85,1.85),
-  new THREE.MeshBasicMaterial({map:faceTexture,side:THREE.DoubleSide})
-);
-botFace.position.set(0,1.7,.34);
-bot.add(botFace);
-scene.add(bot);
+ for(let z=1;z<N-1;z++){
+  grid[z][5]=0;
+  grid[z][10]=0;
+ }
 
-const orbLocations = [
-  [-16,-16],[-5,-16],[14,-17],[16,0],[-15,7],
-  [-4,4],[8,8],[3,17],[-17,16],[15,15]
-];
-let orbs = [];
-function createOrbs(){
-  for(const orb of orbs) scene.remove(orb.mesh);
-  orbs = [];
-  for(const [x,z] of orbLocations){
-    const mesh = new THREE.Mesh(
-      new THREE.IcosahedronGeometry(.29,1),
-      new THREE.MeshBasicMaterial({color:0x58eaff})
-    );
-    mesh.position.set(x,.95,z);
-    scene.add(mesh);
-    orbs.push({mesh,x,z,active:true});
+ for(let z=0;z<N;z++){
+  for(let x=0;x<N;x++){
+   if(grid[z][x]){
+    addWall((x-7)*CELL,(z-7)*CELL,CELL,CELL);
+   }
   }
-}
+ }
 
-const keys = Object.create(null);
-let yaw = 0, pitch = 0, score = 0, stamina = 100;
-let playing = false, ended = false, elapsed = 0;
-const clock = new THREE.Clock();
+ const ceiling=new THREE.Mesh(
+  new THREE.PlaneGeometry(N*CELL,N*CELL),
+  material(0x0b0e15)
+ );
+ ceiling.rotation.x=Math.PI/2;
+ ceiling.position.y=3.55;
+ scene.add(ceiling);
 
-function isBlocked(x,z,r=.43){
-  if(Math.abs(x)>19.8 || Math.abs(z)>19.8) return true;
-  return obstacles.some(o =>
-    x+r > o.x-o.w/2 && x-r < o.x+o.w/2 &&
-    z+r > o.z-o.d/2 && z-r < o.z+o.d/2
+ for(let i=0;i<20;i++){
+  const light=new THREE.Mesh(
+   new THREE.BoxGeometry(1.5,.05,.12),
+   new THREE.MeshBasicMaterial({
+    color:i%3===0?0xff334d:0x92baff
+   })
   );
+  light.position.set(
+   (rand()-.5)*N*CELL*.85,
+   3.48,
+   (rand()-.5)*N*CELL*.85
+  );
+  scene.add(light);
+ }
+
+ exitObj=new THREE.Group();
+ exitObj.position.set(HALF-6,0,HALF-6);
+
+ const gate=new THREE.Mesh(
+  new THREE.BoxGeometry(2.4,2.8,.25),
+  new THREE.MeshStandardMaterial({
+   color:0x1be6a2,
+   emissive:0x087c50,
+   emissiveIntensity:1.5
+  })
+ );
+ gate.position.y=1.4;
+ exitObj.add(gate);
+ scene.add(exitObj);
+
+ const glow=new THREE.PointLight(0x13ffad,3,12);
+ glow.position.set(HALF-6,2,HALF-6);
+ scene.add(glow);
 }
 
-function resetGame(){
-  score=0; stamina=100; elapsed=0; yaw=0; pitch=0;
-  camera.position.set(0,1.65,13);
-  bot.position.set(-16,0,-16);
-  createOrbs();
-  scoreNode.textContent='0';
-  staminaBar.style.width='100%';
-  threatNode.textContent='THREAT: LOW';
-  messageNode.textContent='';
-  toastNode.textContent='';
-  ended=false;
+function makePin(x,z){
+ const group=new THREE.Group();
+ group.position.set(x,.8,z);
+
+ const core=new THREE.Mesh(
+  new THREE.OctahedronGeometry(.35),
+  new THREE.MeshStandardMaterial({
+   color:0x55eaff,
+   emissive:0x1689bd,
+   emissiveIntensity:2
+  })
+ );
+ group.add(core);
+
+ const ring=new THREE.Mesh(
+  new THREE.TorusGeometry(.48,.045,8,24),
+  new THREE.MeshBasicMaterial({color:0x70f5ff})
+ );
+ ring.rotation.x=Math.PI/2;
+ group.add(ring);
+ scene.add(group);
+ pickups.push({obj:group,x,z,got:false});
 }
 
-function showEnd(won){
-  playing=false; ended=true;
-  if(document.pointerLockElement) document.exitPointerLock();
-  overlay.style.display='flex';
-  document.getElementById('title').textContent=won?'YOU SURVIVED':'YOU GOT CAUGHT';
-  document.getElementById('subtitle').textContent=won
-    ? 'Bạn đã thu thập đủ orb. Giỏi lắm!'
-    : 'Nextbot đã bắt được bạn. Thử lại nhé!';
-  startButton.textContent='CHƠI LẠI';
+function makeBot(){
+ const c=document.createElement('canvas');
+ c.width=c.height=256;
+ const ctx=c.getContext('2d');
+
+ ctx.fillStyle='#f7f7f7';
+ ctx.fillRect(0,0,256,256);
+
+ ctx.fillStyle='#111';
+ ctx.beginPath();
+ ctx.ellipse(76,93,22,34,0,0,Math.PI*2);
+ ctx.ellipse(180,93,22,34,0,0,Math.PI*2);
+ ctx.fill();
+
+ ctx.strokeStyle='#111';
+ ctx.lineWidth=13;
+ ctx.beginPath();
+ ctx.arc(128,145,62,.15*Math.PI,.85*Math.PI);
+ ctx.stroke();
+
+ const tex=new THREE.CanvasTexture(c);
+ const face=new THREE.Mesh(
+  new THREE.PlaneGeometry(2.4,2.4),
+  new THREE.MeshBasicMaterial({map:tex,side:THREE.DoubleSide})
+ );
+
+ bot=new THREE.Group();
+ bot.add(face);
+ bot.position.set(HALF-12,1.8,-HALF+12);
+ scene.add(bot);
+
+ const light=new THREE.PointLight(0xff123d,2.5,10);
+ light.position.z=1;
+ bot.add(light);
 }
 
-startButton.addEventListener('click',()=>{
-  if(ended || startButton.textContent==='BẮT ĐẦU') resetGame();
-  overlay.style.display='none';
-  renderer.domElement.requestPointerLock();
-});
+function blocked(x,z){
+ const r=.42;
+ if(x < -HALF+1 || x > HALF-1 ||
+    z < -HALF+1 || z > HALF-1) return true;
 
-document.addEventListener('pointerlockchange',()=>{
-  if(document.pointerLockElement===renderer.domElement){
-    playing=true;
-    clock.getDelta();
-  } else if(playing){
-    playing=false;
-    overlay.style.display='flex';
-    document.getElementById('title').textContent='TẠM DỪNG';
-    document.getElementById('subtitle').textContent='Bấm tiếp tục để chơi tiếp.';
-    startButton.textContent='TIẾP TỤC';
-  }
-});
-
-document.addEventListener('mousemove',e=>{
-  if(!playing) return;
-  yaw -= e.movementX*.0022;
-  pitch -= e.movementY*.0022;
-  pitch = Math.max(-1.4,Math.min(1.4,pitch));
-});
-
-document.addEventListener('keydown',e=>{
-  keys[e.code]=true;
-  if(['Space','ArrowUp','ArrowDown','ArrowLeft','ArrowRight'].includes(e.code)) e.preventDefault();
-});
-document.addEventListener('keyup',e=>{keys[e.code]=false;});
-window.addEventListener('blur',()=>{for(const k in keys) keys[k]=false;});
-
-function update(dt){
-  elapsed += dt;
-  camera.rotation.set(pitch,yaw,0,'YXZ');
-
-  const forward = new THREE.Vector3(-Math.sin(yaw),0,-Math.cos(yaw));
-  const right = new THREE.Vector3(Math.cos(yaw),0,-Math.sin(yaw));
-  const move = new THREE.Vector3();
-  if(keys.KeyW || keys.ArrowUp) move.add(forward);
-  if(keys.KeyS || keys.ArrowDown) move.sub(forward);
-  if(keys.KeyD || keys.ArrowRight) move.add(right);
-  if(keys.KeyA || keys.ArrowLeft) move.sub(right);
-
-  const sprint = (keys.ShiftLeft || keys.ShiftRight) && stamina>0 && move.lengthSq()>0;
-  if(sprint) stamina=Math.max(0,stamina-32*dt);
-  else stamina=Math.min(100,stamina+20*dt);
-  staminaBar.style.width=stamina+'%';
-
-  if(move.lengthSq()>0){
-    move.normalize().multiplyScalar((sprint?7.2:4.1)*dt);
-    const p=camera.position;
-    if(!isBlocked(p.x+move.x,p.z)) p.x+=move.x;
-    if(!isBlocked(p.x,p.z+move.z)) p.z+=move.z;
-  }
-
-  const dx=camera.position.x-bot.position.x;
-  const dz=camera.position.z-bot.position.z;
-  const distance=Math.hypot(dx,dz);
-  const speed=1.9+Math.min(score*.1,1.1)+Math.min(elapsed*.008,.7);
-  if(distance>.001){
-    const sx=dx/distance*speed*dt;
-    const sz=dz/distance*speed*dt;
-    if(!isBlocked(bot.position.x+sx,bot.position.z)) bot.position.x+=sx;
-    if(!isBlocked(bot.position.x,bot.position.z+sz)) bot.position.z+=sz;
-  }
-  bot.position.y=.05*Math.sin(elapsed*5);
-  bot.rotation.y=Math.atan2(dx,dz);
-
-  if(distance<6.5){
-    threatNode.textContent='THREAT: HIGH';
-    messageNode.textContent='CHẠY ĐI!';
-  }else if(distance<12){
-    threatNode.textContent='THREAT: MEDIUM';
-    messageNode.textContent='';
-  }else{
-    threatNode.textContent='THREAT: LOW';
-    messageNode.textContent='';
-  }
-
-  for(const orb of orbs){
-    if(!orb.active) continue;
-    orb.mesh.rotation.y += dt*1.8;
-    orb.mesh.position.y = .95 + Math.sin(elapsed*2+orb.x)*.13;
-    if(Math.hypot(camera.position.x-orb.x,camera.position.z-orb.z)<1.15){
-      orb.active=false;
-      scene.remove(orb.mesh);
-      score++;
-      scoreNode.textContent=String(score);
-      toastNode.textContent='+1 ORB';
-    }
-  }
-
-  if(distance<1.45){showEnd(false);return;}
-  if(score===orbLocations.length){showEnd(true);}
+ return walls.some(w=>
+  Math.abs(x-w.x)<w.w/2+r &&
+  Math.abs(z-w.z)<w.d/2+r
+ );
 }
 
 function resize(){
-  const w=Math.max(1,root.clientWidth), h=Math.max(1,root.clientHeight);
-  camera.aspect=w/h;
-  camera.updateProjectionMatrix();
-  renderer.setSize(w,h);
+ if(!renderer)return;
+ const r=canvas.getBoundingClientRect();
+ renderer.setSize(r.width,r.height,false);
+ camera.aspect=r.width/r.height;
+ camera.updateProjectionMatrix();
 }
-window.addEventListener('resize',resize);
-resize();
 
-function animate(){
-  requestAnimationFrame(animate);
-  const dt=Math.min(clock.getDelta(),.05);
-  if(playing) update(dt);
-  renderer.render(scene,camera);
+function init(){
+ scene=new THREE.Scene();
+ scene.background=new THREE.Color(0x070a11);
+ scene.fog=new THREE.FogExp2(0x070a11,.026);
+
+ camera=new THREE.PerspectiveCamera(76,1,.1,180);
+ camera.position.set(player.x,1.65,player.z);
+
+ renderer=new THREE.WebGLRenderer({canvas,antialias:true});
+ renderer.setPixelRatio(Math.min(devicePixelRatio,1.7));
+ renderer.outputColorSpace=THREE.SRGBColorSpace;
+
+ scene.add(new THREE.HemisphereLight(0x8395b9,0x161923,1.2));
+
+ const light=new THREE.PointLight(0x93b8ff,30,28);
+ light.position.set(player.x,2.7,player.z);
+ scene.add(light);
+
+ makeMaze();
+ makeBot();
+
+ let made=0,attempt=0;
+ while(made<8&&attempt++<500){
+  const x=(Math.floor(rand()*(N-2))+1-7)*CELL;
+  const z=(Math.floor(rand()*(N-2))+1-7)*CELL;
+
+  if(Math.hypot(x-player.x,z-player.z)>8 &&
+     Math.hypot(x-(HALF-6),z-(HALF-6))>5 &&
+     !walls.some(w=>
+      Math.abs(x-w.x)<w.w/2+1 &&
+      Math.abs(z-w.z)<w.d/2+1
+     )){
+   makePin(x,z);
+   made++;
+  }
+ }
+
+ clock=new THREE.Clock();
+ resize();
+ window.addEventListener('resize',resize);
+ renderer.setAnimationLoop(tick);
 }
-createOrbs();
-animate();
+
+function start(){
+ if(!renderer)init();
+
+ player={x:-HALF+6,z:-HALF+6};
+ pins=0;
+ stamina=100;
+ yaw=0;
+ pitch=0;
+ countEl.textContent='PIN: 0 / 8';
+ staminaEl.style.width='100%';
+ active=true;
+ overlay.style.display='none';
+ message.textContent='';
+ canvas.requestPointerLock?.();
+}
+
+function finish(win){
+ active=false;
+ overlay.style.display='flex';
+
+ document.getElementById('title').textContent=
+  win?'YOU ESCAPED':'YOU GOT CAUGHT';
+
+ document.getElementById('title').style.color=
+  win?'#4df5b1':'#ff304e';
+
+ document.getElementById('desc').textContent=
+  win?'Bạn đã thoát khỏi mê cung!':
+  'Nextbot đã bắt được bạn. Thử lại nhé!';
+
+ document.getElementById('start').textContent='CHƠI LẠI';
+ document.exitPointerLock?.();
+}
+
+document.getElementById('start').addEventListener('click',start);
+
+document.addEventListener('keydown',e=>{
+ keys[e.code]=true;
+ if(e.code==='KeyE'&&!active)start();
+});
+
+document.addEventListener('keyup',e=>keys[e.code]=false);
+
+document.addEventListener('mousemove',e=>{
+ if(document.pointerLockElement===canvas&&active){
+  yaw-=e.movementX*.0022;
+  pitch-=e.movementY*.0022;
+  pitch=Math.max(-1.25,Math.min(1.25,pitch));
+ }
+});
+
+canvas.addEventListener('click',()=>{
+ if(active)canvas.requestPointerLock?.();
+});
+
+function tick(){
+ if(!renderer)return;
+ const dt=Math.min(clock.getDelta(),.04);
+
+ if(active){
+  const fx=-Math.sin(yaw),fz=-Math.cos(yaw);
+  const rx=Math.cos(yaw),rz=-Math.sin(yaw);
+  let dx=0,dz=0;
+
+  if(keys.KeyW||keys.ArrowUp){dx+=fx;dz+=fz}
+  if(keys.KeyS||keys.ArrowDown){dx-=fx;dz-=fz}
+  if(keys.KeyD||keys.ArrowRight){dx+=rx;dz+=rz}
+  if(keys.KeyA||keys.ArrowLeft){dx-=rx;dz-=rz}
+
+  const moving=Math.hypot(dx,dz)>0;
+  const sprint=(keys.ShiftLeft||keys.ShiftRight)&&stamina>1&&moving;
+
+  if(moving){
+   const n=Math.hypot(dx,dz);
+   dx/=n;dz/=n;
+
+   const speed=sprint?7.5:4.4;
+   if(sprint)stamina=Math.max(0,stamina-29*dt);
+   else stamina=Math.min(100,stamina+17*dt);
+
+   const nx=player.x+dx*speed*dt;
+   const nz=player.z+dz*speed*dt;
+
+   if(!blocked(nx,player.z))player.x=nx;
+   if(!blocked(player.x,nz))player.z=nz;
+  }else{
+   stamina=Math.min(100,stamina+20*dt);
+  }
+
+  camera.position.set(player.x,1.65,player.z);
+  camera.rotation.order='YXZ';
+  camera.rotation.y=yaw;
+  camera.rotation.x=pitch;
+
+  staminaEl.style.width=stamina+'%';
+  staminaEl.style.background=stamina<25?'#ff405a':'#50e59a';
+
+  const dist=Math.hypot(
+   bot.position.x-player.x,
+   bot.position.z-player.z
+  );
+
+  const speed=2.35+Math.min(pins*.13,1.1)+(dist<8?1:0);
+  const a=Math.atan2(
+   player.x-bot.position.x,
+   player.z-bot.position.z
+  );
+
+  bot.position.x+=Math.sin(a)*speed*dt;
+  bot.position.z+=Math.cos(a)*speed*dt;
+  bot.position.y=1.8+Math.sin(performance.now()*.006)*.12;
+  bot.rotation.y=a;
+
+  if(blocked(bot.position.x,bot.position.z)){
+   bot.position.x-=Math.sin(a)*speed*dt*1.5;
+   bot.position.z-=Math.cos(a)*speed*dt*1.5;
+  }
+
+  for(const p of pickups){
+   if(!p.got){
+    p.obj.rotation.y+=dt*1.6;
+    p.obj.position.y=.8+Math.sin(performance.now()*.003+p.x)*.12;
+
+    if(Math.hypot(p.x-player.x,p.z-player.z)<1.35){
+     p.got=true;
+     scene.remove(p.obj);
+     pins++;
+     countEl.textContent='PIN: '+pins+' / 8';
+     message.textContent='ĐÃ NHẶT PIN!';
+    }
+   }
+  }
+
+  const exitDist=Math.hypot(
+   exitObj.position.x-player.x,
+   exitObj.position.z-player.z
+  );
+
+  if(exitDist<2.1){
+   if(pins>=8){finish(true)}
+   else{message.textContent='CẦN ĐỦ 8 PIN ĐỂ MỞ CỬA'}
+  }else if(message.textContent==='CẦN ĐỦ 8 PIN ĐỂ MỞ CỬA'){
+   message.textContent='';
+  }
+
+  danger.textContent=dist<13?'⚠ NEXTBOT ĐANG ĐẾN GẦN':'';
+  if(dist<1.55)finish(false);
+ }
+
+ renderer.render(scene,camera);
+}
+
+init();
 })();
 </script>
-</body>
-</html>
 """
-
-components.html(game_html, height=700, scrolling=False)
+components.html(game,height=650,scrolling=False)
+st.caption("Game cần internet để tải Three.js. Dùng máy tính và chuột để chơi.")
