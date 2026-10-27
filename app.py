@@ -516,7 +516,7 @@ const gh={phase:'idle',t:0,t0:1,x:0,z:0,alpha:0,peek:0,face:0,step:0,ux:0,uz:1};
 const renderer=new THREE.WebGLRenderer({antialias:(window.devicePixelRatio||1)<1.5,powerPreference:'high-performance'});
 renderer.setPixelRatio(pr());
 renderer.setSize(1280,720);
-renderer.toneMapping=THREE.ACESFilmicToneMapping; renderer.toneMappingExposure=1.3;
+renderer.toneMapping=THREE.ACESFilmicToneMapping; renderer.toneMappingExposure=1.0;
 renderer.shadowMap.enabled=true; renderer.shadowMap.type=THREE.PCFShadowMap;
 $('c').appendChild(renderer.domElement);
 const canvas=renderer.domElement;
@@ -549,12 +549,12 @@ const spot=new THREE.SpotLight(0xfff0cc,2.1,24,Math.PI/5.2,0.5,1.1);
 spot.position.set(0.2,-0.1,0);   // đèn pin gắn vào camera
  camera.add(spot); camera.add(spot.target); spot.target.position.set(0,0,-3);
 spot.shadow.mapSize.set(1024,1024); spot.shadow.camera.near=0.2; spot.shadow.camera.far=16; spot.shadow.bias=-0.0006;
-const ambL=new THREE.AmbientLight(0x34456a,0.8); scene.add(ambL);   // ánh trăng xanh lạnh ban đêm
-const moonL=new THREE.DirectionalLight(0x7f95c8,0.28); moonL.position.set(-8,20,6); scene.add(moonL);
+const ambL=new THREE.AmbientLight(0x2a3858,0.3); scene.add(ambL);   // ánh trăng xanh lạnh ban đêm
+const moonL=new THREE.DirectionalLight(0x6f84b8,0.1); moonL.position.set(-8,20,6); scene.add(moonL);
 // Các đèn cố định (tạo một lần để tránh biên dịch lại shader)
-const lamp=new THREE.PointLight(0xe4eeff,1.1,46); scene.add(lamp);
+const lamp=new THREE.PointLight(0xe4eeff,1.1,30); scene.add(lamp);
 lamp.shadow.mapSize.set(512,512); lamp.shadow.camera.near=0.3; lamp.shadow.camera.far=24; lamp.shadow.bias=-0.003;
-const lampB=new THREE.PointLight(0xe4eeff,0.9,42); scene.add(lampB);
+const lampB=new THREE.PointLight(0xe4eeff,0.9,28); scene.add(lampB);
 const doorLight=new THREE.PointLight(0xfff1c9,0,10); scene.add(doorLight);
 const nextL=new THREE.PointLight(0xffd9a0,0,40), prevL=new THREE.PointLight(0xffc890,0,36); scene.add(nextL); scene.add(prevL);   // chiếu sáng phòng kề bên để nhìn xuyên ô cửa
 const sconceL=[0,1].map((_,i)=>{const l=new THREE.PointLight(0xff9a40,1.0,9);if(i===0)scene.add(l);return l;});   // chỉ giữ 1 đèn phụ trong scene
@@ -916,7 +916,7 @@ function buildRoom(keep){
   obstacles=[]; inter=[]; watchers=[]; spots=[]; doorOpen=false; curSpot=null; fireMat=null;
   const sz=SIZES[layoutOrder[door%5]]; RW=sz[0]; RD=sz[1];
   const lay=layoutOrder[door%5], hw=RW/2, hd=RD/2, m=mirrorArr[door%5], S1=-m, S2=m;
-  scene.fog=new THREE.FogExp2(0x050912,0.024+door*0.003);
+  scene.fog=new THREE.FogExp2(0x03060c,0.036+door*0.004);
   renderer.shadowMap.enabled=HQ; spot.castShadow=HQ; lamp.castShadow=false;
   const R=mulberry(gameSeed+door*7919+17);
   const pick=a=>a[Math.floor(R()*a.length)];
@@ -1693,7 +1693,7 @@ function applyQuality(noBuild){
   HQ=Q>=6;
   renderer.setPixelRatio(pr()); renderer.setSize(STW,STH);
   canvas.style.imageRendering=HQ?'auto':'pixelated';
-  renderer.toneMappingExposure=HQ?1.3:1.55;
+  renderer.toneMappingExposure=HQ?1.0:1.25;
   [[spot,Q>=9?1024:512],[lamp,Q>=9?512:256]].forEach(a=>{
     if(a[0].shadow.map){a[0].shadow.map.dispose();a[0].shadow.map=null;} a[0].shadow.mapSize.set(a[1],a[1]);});
   $('grain').style.display=HQ?'block':'none'; dust.visible=HQ;
@@ -2270,7 +2270,7 @@ function update(dt){
   for(let i=0;i<DUST;i++){dustPos[i*3+1]+=Math.sin(tt*.6+i)*0.0009+0.0006;dustPos[i*3]+=Math.cos(tt*.4+i*1.7)*0.0007;
     if(dustPos[i*3+1]>RH)dustPos[i*3+1]=0;}
   dustGeo.attributes.position.needsUpdate=true;
-  sconceL.forEach((l,i)=>l.intensity=(0.6+0.18*Math.sin(tt*13+i*2.1)*Math.sin(tt*5.3+i))*lampF);
+  sconceL.forEach((l,i)=>l.intensity=(0.3+0.1*Math.sin(tt*13+i*2.1)*Math.sin(tt*5.3+i))*lampF);
   if(fireMat) fireMat.opacity=.7+.2*Math.sin(tt*17)*Math.sin(tt*7.3);
   animGhost(dt);
   if(state==='scare'){ updScare(dt); return; }
@@ -2317,7 +2317,7 @@ function update(dt){
   }
   if(!hidden) camera.position.y=1.6+(moving?Math.sin(bob)*0.04:0);
   if(intro.on) introUpdate(dt);
-  nextL.intensity=blackT>0?0:(rooms[door+1]?.9:0); prevL.intensity=blackT>0?0:(rooms[door-1]?.5:0);
+  nextL.intensity=blackT>0?0:(rooms[door+1]?.3:0); prevL.intensity=blackT>0?0:(rooms[door-1]?.15:0);
   if(doorOpen){ if(doorPivot.rotation.y>-1.7) doorPivot.rotation.y=Math.max(-1.7,doorPivot.rotation.y-dt*1.5);   // cánh cửa mở vào phía trong phòng
     if(doorGlow&&rooms[door+1]) doorGlow.visible=false;      // đã có phòng sau -> thấy thẳng phòng sau qua ô cửa
     doorLight.intensity=Math.min(1.8,doorLight.intensity+dt*1.5); }
@@ -2379,8 +2379,8 @@ function update(dt){
   if(boltT>0&&(1-boltT)<.22) lampF=Math.min(lampF,RF?.45:.04);
   let bf=1;
   if(blackT>0){ const el=blackD-blackT; bf=(!RF&&(el<.6||blackT<.8))?(Math.random()<.35?1:0):0; lampF*=bf; }
-  ambL.intensity=blackT>0?(.02+flashV*1.2):(.8*(1-dark*.7)+flashV*1.2);
-  lamp.intensity=1.3*lampF; lampB.intensity=1.1*lampF;
+  ambL.intensity=blackT>0?(.02+flashV*1.2):(.22*(1-dark*.7)+flashV*1.2);
+  lamp.intensity=.3*lampF; lampB.intensity=.22*lampF;
   if(flameMat){const v=Math.max(blackT>0?.04:.15,lampF);flameMat.color.setRGB(v*.94,v*.98,v);}
   if(!hidden) spot.intensity=flashOn&&!intro.on?(blackT>0?3.8:1.5)*(0.96+0.04*Math.sin(tt*23))*(ghostOn&&blackT<=0?.5:1):0;
   flashAmt+=((flashOn&&!hidden&&!intro.on)?1-flashAmt:-flashAmt)*Math.min(1,dt*10);
