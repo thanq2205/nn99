@@ -1764,10 +1764,13 @@ function switchRoom(ni){
   const fwd=ni>door, off=RD/2+target.RD/2+GAP;
   rooms[door]=saveRoomState(); rooms[ni]=null;
   camera.position.z+=(fwd?1:-1)*off;
+  const chasing=gh.phase!=='idle';
+  if(chasing) gh.z+=(fwd?1:-1)*off;           // Verity đang đuổi: giữ nguyên, chỉ đổi sang tọa độ phòng mới để cô ấy vẫn bám theo qua cửa
   door=ni; loadRoomState(target); layoutNeighbors();
-  doorLight.intensity=0; hidden=false; $('hide').style.display='none'; parkGhost(); refreshClues();
-  ghostTimer=16+Math.random()*16; updateHud(); setTimeout(prebuildNext,60);
-  if(!target.visited){ target.visited=true; banner(DOORS[door].name.toUpperCase()+'\n'+DOORS[door].intro,3800); }
+  doorLight.intensity=0; hidden=false; $('hide').style.display='none'; refreshClues();
+  if(!chasing){ parkGhost(); ghostTimer=16+Math.random()*16; }
+  updateHud(); setTimeout(prebuildNext,60);
+  if(!target.visited){ target.visited=true; if(!chasing) banner(DOORS[door].name.toUpperCase()+'\n'+DOORS[door].intro,3800); }
 }
 function nextRoom(){
   transitioning=true; $('fade').style.opacity=1;
@@ -1831,6 +1834,13 @@ function ghostSpawn(){
   if(ghostSound()) gh.shr=true;            // có file tiếng ma -> bỏ tiếng gào tổng hợp
   else{ noise(1.4,.3); tone(70,1.6,'sawtooth',.2,160); }
 }
+// Ma và người chơi ở hai phòng khác nhau -> ma đi tới ô cửa giữa hai phòng trước rồi mới đuổi tiếp (không xuyên tường)
+const gzone=z=>z>RD/2+GAP/2+.05?1:(z<-RD/2-GAP/2-.05?-1:0);
+function ghostGoal(tx,tz){
+  const gz=gzone(gh.z), tzn=gzone(tz);
+  if(gz!==0&&gz!==tzn) return [0,gz*(RD/2+GAP/2)];
+  return [tx,tz];
+}
 function moveGhost(tx,tz,sp,dt){
   const dx=tx-gh.x,dz=tz-gh.z,d=Math.hypot(dx,dz)||1,s=Math.min(d,sp*dt);
   gh.x+=dx/d*s; gh.z+=dz/d*s; if(d>.05) gh.face=Math.atan2(dx,dz); return d;
@@ -1868,11 +1878,11 @@ function updGhost(dt){
   const px=camera.position.x, pz=camera.position.z;
   if(P==='hunt'){
     if(!hidden){
-      const d=moveGhost(px,pz,3.6,dt);
-      if(d<1.15){caught();return;}
+      const g=ghostGoal(px,pz); moveGhost(g[0],g[1],3.6,dt);
+      if(Math.hypot(gh.x-px,gh.z-pz)<1.15){caught();return;}
     } else {
-      const sp=curSpot, d=moveGhost(sp.x+sp.fx*sp.gd,sp.z+sp.fz*sp.gd,3.6,dt);
-      if(d<0.12){gh.phase='search'; gh.t0=gh.t=6+Math.random()*1.5; gh.peek=0; whisper('tôi biết bạn ở đây...');}
+      const sp=curSpot, ex=sp.x+sp.fx*sp.gd, ez=sp.z+sp.fz*sp.gd, g=ghostGoal(ex,ez); moveGhost(g[0],g[1],3.6,dt);
+      if(Math.hypot(gh.x-ex,gh.z-ez)<0.12){gh.phase='search'; gh.t0=gh.t=6+Math.random()*1.5; gh.peek=0; whisper('tôi biết bạn ở đây...');}
     }
     gh.step-=dt; if(gh.step<=0){gh.step=.55; const dd=Math.hypot(gh.x-px,gh.z-pz); tone(45,.25,'sine',Math.min(.5,1/(dd*.3+1)),30); noise(.08,Math.min(.2,.6/(dd+1)));}
   } else if(P==='search'){
