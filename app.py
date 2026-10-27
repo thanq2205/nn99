@@ -57,6 +57,17 @@ SCHOOL_QS = [
      "a": "Chim cánh cụt", "w": ["Con vịt", "Con hải cẩu", "Con mòng biển"], "digit": 4, "hint": "Sống ở vùng cực lạnh giá, không biết bay."},
 ]
 
+# Bức tranh bí ẩn: mỗi ván bốc 1 bức. e = emoji làm tranh (hoặc "img": "file.png" cùng thư mục app.py); a = từ khóa phải điền vào ô trống.
+PUZZLES = [
+    {"e": "🦁", "a": "SƯ TỬ"},
+    {"e": "🚀", "a": "TÊN LỬA"},
+    {"e": "🏰", "a": "LÂU ĐÀI"},
+    {"e": "🌻", "a": "HOA HƯỚNG DƯƠNG"},
+    {"e": "🐙", "a": "BẠCH TUỘC"},
+    {"e": "🎸", "a": "ĐÀN GHI TA"},
+    {"e": "🚁", "a": "MÁY BAY TRỰC THĂNG"},
+]
+
 _ROOMS = [   # thứ tự = kiểu khu 3D: 0 sân cờ, 1 dãy lớp học, 2 sân bóng, 3 vườn cây phượng, 4 cổng trường
     ("Sân cờ", "Cột cờ lặng gió giữa đêm. Các dãy lớp học xung quanh tối om, cửa sổ đen kịt..."),
     ("Dãy lớp học", "Cửa lớp khép chặt, ghế đá ướt mưa dưới hành lang. Có tiếng thì thầm: 'Trả lời đi...'"),
@@ -190,6 +201,10 @@ def build_pool() -> str:
     return json.dumps([_qd(q) for q in EXTRA_QUESTIONS], ensure_ascii=False)
 
 
+def build_puz() -> str:
+    return json.dumps([{"p": _pic(x), "a": x["a"]} for x in PUZZLES], ensure_ascii=False)
+
+
 def build_data() -> str:
     out = []
     for d in DOORS:
@@ -222,7 +237,15 @@ GAME_HTML = r"""
   #ui{position:absolute;left:0;top:0;width:1280px;height:720px;transform-origin:0 0;overflow:hidden;pointer-events:none}
   .ov,#modal,#sl,#fs,button,input{pointer-events:auto}
   #fs{position:absolute;top:8px;right:10px;z-index:30;padding:5px 10px;font-size:13px;margin:0;opacity:.75}
-  #fs:hover,#mu:hover{opacity:1}
+  #fs:hover,#mu:hover,#pz:hover{opacity:1}
+  #pz{position:absolute;top:8px;right:132px;z-index:30;padding:5px 9px;font-size:13px;margin:0;opacity:.75;display:none}
+  .touch #pz{padding:10px 14px;font-size:18px;right:170px}
+  #pbl{display:none;flex-wrap:wrap;justify-content:center;gap:5px;margin:6px 0}
+  .pc{display:inline-block;width:30px;height:38px;border-bottom:4px solid #16130f;font-size:26px;font-weight:900;line-height:38px;color:#8a0f0f}
+  .pg{display:inline-block;width:16px}
+  #box.pz #mpic{height:auto;line-height:0;font-size:0}
+  #box.pz #mpic canvas{width:400px;height:240px;border:3px solid #16130f;background:#120d09}
+  #box.pz #mi{font-size:20px;padding:6px;width:70%}
   #mu{position:absolute;top:8px;right:74px;z-index:30;padding:5px 9px;font-size:13px;margin:0;opacity:.75}
   #lockbtn{position:absolute;right:16px;bottom:16px;z-index:7;width:56px;height:56px;padding:0;margin:0;border-radius:50%;
            font-size:18px;font-weight:bold;background:rgba(0,0,0,.55);border:2px solid #9a2a2a;display:none}
@@ -367,8 +390,8 @@ GAME_HTML = r"""
 <div id="vig"></div><canvas id="grain"></canvas><div id="lowhp"></div>
 <div id="cross"></div>
 <div id="hud"><div id="dn"></div><div id="hp"></div><div id="hn"></div><div id="ks"></div><div id="ot"></div><div id="stw" style="width:150px;height:8px;border:1px solid #7a2a2a;background:rgba(0,0,0,.55);margin-top:5px"><div id="stb" style="height:100%;width:100%;background:#d9b45a"></div></div></div>
-<div id="help">WASD / ←→: di chuyển · Kéo chuột: nhìn · Shift: Shift Lock · Giữ Space: chạy · F: đèn pin · E: tương tác · A/B/C/D: chọn đáp án · Esc: đóng</div>
-<button id="fs" title="Toàn màn hình">FULL</button><button id="mu" title="Bật / tắt âm thanh">🔊</button>
+<div id="help">WASD / ←→: di chuyển · Kéo chuột: nhìn · Shift: Shift Lock · Giữ Space: chạy · F: đèn pin · E: tương tác · P: bức tranh · A/B/C/D: chọn đáp án · Esc: đóng</div>
+<button id="fs" title="Toàn màn hình">FULL</button><button id="mu" title="Bật / tắt âm thanh">🔊</button><button id="pz" title="Bức tranh bí ẩn (phím P)">🧩</button>
 <button id="lockbtn" title="Shift Lock (phím Shift)">SL</button>
 <div id="tui"><div id="joyB"></div><div id="joyK"></div><div id="tE" class="tb">E</div><div id="tRun" class="tb">CHẠY</div><div id="tF" class="tb">F</div></div>
 <div id="prompt"></div>
@@ -382,7 +405,7 @@ GAME_HTML = r"""
 <div id="fade"></div>
 
 <div id="modal"><div id="box">
-  <div id="mt"></div><div id="vd"></div><div id="mq"></div><div id="mpic"></div>
+  <div id="mt"></div><div id="vd"></div><div id="mq"></div><div id="mpic"></div><div id="pbl"></div>
   <div id="opts"></div>
   <input id="mi" autocomplete="off" spellcheck="false" inputmode="numeric">
   <div id="fb"></div>
@@ -417,7 +440,7 @@ GAME_HTML = r"""
 
 <div id="story" class="ov">
   <div class="sty">
-    <p>Bạn bị nhốt lại ở sân trường giữa đêm bão. Chạy khắp các khu của trường, tìm <b class="cl">15 MẢNH GHÉP PHÁT SÁNG</b>. Mỗi mảnh phải <b>nhìn hình đoán đúng</b> mới lấy được. Đủ mảnh thì <b>cổng thoát</b> sẽ mở.</p>
+    <p>Bạn bị nhốt lại ở sân trường giữa đêm bão. Chạy khắp các khu của trường, tìm <b class="cl">15 MẢNH GHÉP PHÁT SÁNG</b>. Mỗi mảnh phải <b>nhìn hình đoán đúng</b> mới lấy được, và mỗi mảnh lộ ra một phần <b>bức tranh bí ẩn</b>. Đoán đúng <b>từ khóa</b> của bức tranh (điền vào ô trống) thì <b>cổng thoát</b> sẽ mở.</p>
     <p>Cô giáo ma <b>VERITY</b> luôn rình rập khi bạn trả lời câu hỏi. <b>Trả lời sai, cô ấy sẽ tới sớm hơn.</b> Trốn trong <b>bụi cây</b> hoặc <b>gầm bàn bóng bàn</b> (<kbd>E</kbd>).</p>
   </div>
   <div class="mb"><button id="sgo">BẮT ĐẦU</button></div>
@@ -442,7 +465,7 @@ GAME_HTML = r"""
     <h3>Mục tiêu</h3>
     <ul>
       <li>Sân trường có <b>5 khu</b> thông nhau, cứ đi tự do qua lại giữa các khu. Mỗi khu giấu <b>3 mảnh ghép</b> phát sáng (tổng 15). Nhìn <b>hình ảnh</b> rồi chọn đáp án <b>A/B/C/D</b> đúng để nhặt mảnh ghép.</li>
-      <li>Không có qua màn: nhặt đủ 15 mảnh theo thứ tự tùy bạn, rồi chạy tới <b>cổng thoát</b> ở khu cuối cùng của trường.</li>
+      <li>Mỗi mảnh ghép lộ ra một phần <b>bức tranh bí ẩn</b>. Bấm <kbd>P</kbd> (hoặc nút 🧩) để xem tranh, rồi <b>đoán từ khóa</b> và điền vào các <b>ô trống</b> (phải đủ chữ, khớp ô). Đoán đúng thì chạy tới <b>cổng thoát</b> ở khu cuối cùng. Đoán sai mất 1 mạng.</li>
       <li>Chọn sai đáp án sẽ mất 1 (có 3 ).</li>
     </ul>
     <h3>Verity – cô giáo ma</h3>
@@ -484,12 +507,13 @@ GAME_HTML = r"""
 <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
 <script>
 (function(){
-const DOORS_BASE = __DATA__, EXTRA_Q = __POOL__, FIXED_Q = __FIXED__, BONUS_Q = __BONUS__;
+const DOORS_BASE = __DATA__, EXTRA_Q = __POOL__, FIXED_Q = __FIXED__, BONUS_Q = __BONUS__, PUZZLES = __PUZ__;
 const QPOOL = [].concat.apply([], DOORS_BASE.map(d=>d.questions)).concat(EXTRA_Q);
 let DOORS = DOORS_BASE;
 let layoutOrder=[0,1,2,3,4], wallOrder=[0,1,2,3,4], mirrorArr=[1,-1,1,-1,1], gameSeed=17;
 // Mỗi ván: xáo thứ tự kiểu phòng, màu tường, hướng đối xứng, và bốc ngẫu nhiên câu hỏi + chữ số + thứ tự ghép chìa cho từng phòng
 function rollGame(){
+  puz=PUZZLES[Math.floor(Math.random()*PUZZLES.length)]; tileOrder=shuffle([...Array(15).keys()]); keySolved=false; buildPuzImg();
   layoutOrder=shuffle([0,1,2,3,4]); wallOrder=shuffle([0,1,2,3,4]); mirrorArr=[0,1,2,3,4].map(()=>Math.random()<.5?1:-1); gameSeed=Math.floor(Math.random()*1e6);
   const pool=shuffle(QPOOL.map((_,i)=>i)); let p=0;
   const fixed=shuffle(FIXED_Q.slice());   // 5 câu bắt buộc: mỗi phòng 1 câu, phòng nhận câu nào là ngẫu nhiên
@@ -527,6 +551,7 @@ let STW=1280, STH=720, mouseX=0, mouseY=0, mouseIn=false, optOrder=[], wrongSet=
 // Cao: độ phân giải gần đầy đủ. Thấp: render độ phân giải rất nhỏ rồi phóng to kiểu pixel (low-poly retro)
 const pr=()=>HQ?Math.max(.8,Math.min(window.devicePixelRatio||1,.4+Q*.12)):(0.28+Q*0.05);
 let RF=loadNum('doors_rf',0,0,1)===1;   // giảm hiệu ứng chớp sáng
+let puz=null, tileOrder=[], keySolved=false, puzImg=null;
 let hp=MAX_HP, hints=HINTS0, door=0, solved=[false,false,false], hintShown={};
 let state='menu', modalOpen=false, modalMode='q', modalIdx=0, hidden=false, doorOpen=false, transitioning=false;
 let yaw=0, pitch=0, dragging=false, shake=0, bob=0, bannerT=null, cur=null, curSpot=null, spots=[];
@@ -1510,7 +1535,8 @@ function updateHud(){
   $('hp').innerHTML='MẠNG '+'<span style="color:#d01a1a">&#9829;</span>'.repeat(Math.max(hp,0))+'<span style="color:#4a4a4a">&#9829;</span>'.repeat(MAX_HP-Math.max(hp,0));
   $('hn').textContent='Gợi ý: '+hints;
   {const n=totalPieces(); $('ks').textContent='Mảnh ghép: '+'■'.repeat(n)+'□'.repeat(PIECES-n)+'  '+n+'/'+PIECES;}
-  $('ot').textContent=totalPieces()>=PIECES?('Đủ mảnh ghép! Chạy tới cổng thoát ở: '+DOORS[DOORS.length-1].name):'';
+  $('ot').textContent=keySolved?('Đã giải mã! Chạy tới cổng thoát ở: '+DOORS[DOORS.length-1].name):(totalPieces()>=PIECES?'Đủ mảnh ghép! Bấm P để đoán từ khóa':'Bấm P xem bức tranh bí ẩn');
+  $('pz').style.display=(state==='play')?'block':'none';
   $('lockbtn').className=shiftLock?'on':''; $('lockbtn').textContent='SL';
   $('lockbtn').style.display=(state==='play'&&!touchMode)?'block':'none';
   $('lowhp').className=(hp===1&&state==='play')?'pulse':'';
@@ -1590,15 +1616,54 @@ function gameOver(msg){
   g.fillStyle=vg;g.fillRect(0,0,w,h);
   $('box').style.backgroundImage='url('+c.toDataURL('image/jpeg',.88)+')';
 })();
+const normKey=t=>(t||'').normalize('NFD').replace(/[̀-ͯ]/g,'').replace(/đ/g,'d').replace(/Đ/g,'D').toUpperCase().replace(/[^A-Z0-9]/g,'');
+function buildPuzImg(){
+  const c=document.createElement('canvas'); c.width=500; c.height=300; puzImg=c; const g=c.getContext('2d');
+  const gr=g.createLinearGradient(0,0,0,300); gr.addColorStop(0,'#2b3a5a'); gr.addColorStop(1,'#8aa0c0'); g.fillStyle=gr; g.fillRect(0,0,500,300);
+  const pp=puz.p;
+  if(pp.indexOf('data:')===0){ const im=new Image(); im.onload=()=>{ const r=Math.min(500/im.width,300/im.height), w=im.width*r, h=im.height*r;
+      g.fillStyle='#111'; g.fillRect(0,0,500,300); g.drawImage(im,(500-w)/2,(300-h)/2,w,h); if(modalOpen&&modalMode==='puz') drawPuzzle(); }; im.src=pp; }
+  else { g.font="230px 'Apple Color Emoji','Segoe UI Emoji','Noto Color Emoji',sans-serif"; g.textAlign='center'; g.textBaseline='middle'; g.fillText(pp,250,160); }
+}
+function drawPuzzle(){
+  const c=$('pcv'); if(!c||!puzImg) return;
+  const g=c.getContext('2d'), W=c.width, H=c.height, cols=5, rows=3, tw=W/cols, th=H/rows;
+  const n=Math.min(15,totalPieces()), rev=new Set(tileOrder.slice(0,n));
+  g.fillStyle='#120d09'; g.fillRect(0,0,W,H);
+  for(let k=0;k<15;k++){ const cx=(k%cols)*tw, cy=Math.floor(k/cols)*th;
+    if(rev.has(k)) g.drawImage(puzImg,cx,cy,tw,th,cx,cy,tw,th);
+    else { g.fillStyle='#1e1610'; g.fillRect(cx+1,cy+1,tw-2,th-2); g.fillStyle='rgba(217,180,90,.28)'; g.font='bold 34px serif'; g.textAlign='center'; g.textBaseline='middle'; g.fillText('?',cx+tw/2,cy+th/2); } }
+  g.strokeStyle='rgba(0,0,0,.65)'; g.lineWidth=2;
+  for(let i=0;i<=cols;i++){g.beginPath();g.moveTo(i*tw,0);g.lineTo(i*tw,H);g.stroke();}
+  for(let j=0;j<=rows;j++){g.beginPath();g.moveTo(0,j*th);g.lineTo(W,j*th);g.stroke();}
+}
+function showBlanks(){
+  const t=normKey($('mi').value); let k=0, h='';
+  for(const ch of puz.a){ if(ch===' '){h+='<span class="pg"></span>';continue;} h+='<span class="pc">'+(k<t.length?t[k]:'')+'</span>'; k++; }
+  $('pbl').innerHTML=h;
+}
+function openPuzzle(){
+  if(state!=='play'||modalOpen||intro.on||!puz) return;
+  if(gh.phase!=='idle'){ banner('Không phải lúc này! Verity đang tới!',1500); return; }
+  if(hidden) return;
+  modalMode='puz'; $('box').classList.add('pic','pz');
+  const n=Math.min(PIECES,totalPieces());
+  $('mt').textContent='BỨC TRANH BÍ ẨN ('+n+'/'+PIECES+' mảnh)';
+  $('mq').textContent=keySolved?'Bạn đã giải mã! Chạy tới cổng thoát.':'Đoán từ khóa của bức tranh rồi điền vào ô trống:';
+  $('mpic').style.display='block'; $('mpic').innerHTML='<canvas id="pcv" width="500" height="300"></canvas>';
+  $('pbl').style.display='flex'; $('opts').style.display='none'; $('b2').style.display='none';
+  $('mi').style.display=''; $('mi').setAttribute('inputmode','text'); $('mi').placeholder='Nhập từ khóa'; $('b1').style.display=''; $('b1').textContent='Đoán';
+  drawPuzzle(); showBlanks(); openModal();
+}
 function shuffle(a){for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]];}return a;}
 function openModal(){modalOpen=true;syncLock();$('modal').style.display='flex';$('fb').textContent='';
-  if(modalMode==='code') setTimeout(()=>$('mi').focus(),30);}
-function closeModal(silent){modalOpen=false;$('modal').style.display='none';$('mi').value='';keys={};
+  if(modalMode==='code'||modalMode==='puz') setTimeout(()=>$('mi').focus(),30);}
+function closeModal(silent){modalOpen=false;$('modal').style.display='none';$('mi').value='';keys={};$('box').classList.remove('pz');$('pbl').style.display='none';
   if(!silent) syncLock();}
 function openQ(i){
   const q=DOORS[door].questions[i]; modalMode='q'; modalIdx=i;
   $('mt').textContent='Câu hỏi '+(i+1); $('mq').textContent=q.q;
-  {const pc=$('mpic'); pc.innerHTML=''; pc.textContent='';
+  {const pc=$('mpic'); pc.innerHTML=''; pc.textContent=''; $('pbl').style.display='none'; $('box').classList.remove('pz');
    if(q.p){ pc.style.display='block'; $('box').classList.add('pic');
      if(q.p.indexOf('data:')===0){const im=document.createElement('img'); im.src=q.p; pc.appendChild(im);} else pc.textContent=q.p; }
    else { pc.style.display='none'; $('box').classList.remove('pic'); } }
@@ -1626,7 +1691,7 @@ function choose(k){
   const q=DOORS[door].questions[modalIdx];
   if(optOrder[k]===0){
     solved[modalIdx]=true; sGood(); closeModal(); refreshClues(); updateHud();
-    {const n=totalPieces(); banner('Đúng! Nhặt được mảnh ghép '+n+'/'+PIECES+(n>=PIECES?'\nĐã đủ! Chạy tới cổng thoát ở '+DOORS[DOORS.length-1].name+'!':''),3200);}
+    {const n=totalPieces(); banner('Đúng! Nhặt được mảnh ghép '+n+'/'+PIECES+'\nBấm P (nút 🧩) để xem tranh & đoán từ khóa',3200);}
   } else {
     wrongSet[k]=true; $('opts').children[k].classList.add('bad'); $('fb').textContent='Sai rồi!';
     verityAngry(); damage('Verity trừng phạt câu trả lời sai!');
@@ -1638,6 +1703,14 @@ function openCode(){
   $('b2').style.display='none'; $('opts').style.display='none'; $('mi').style.display=''; $('b1').style.display=''; openModal();
 }
 function submit(){
+  if(modalMode==='puz'){
+    const t=normKey($('mi').value), a=normKey(puz.a);
+    if(t.length!==a.length){ $('fb').textContent='Phải đủ '+a.length+' chữ cái để khớp các ô trống!'; return; }
+    if(t===a){ keySolved=true; closeModal(); sGood(); tone(70,1.2,'sawtooth',.12,40);
+      banner('ĐÚNG RỒI! Từ khóa: '+puz.a+'\nChạy tới cổng thoát ở '+DOORS[DOORS.length-1].name+'!',4200); updateHud(); }
+    else { $('fb').textContent='Sai từ khóa!'; $('mi').value=''; showBlanks(); verityAngry(); damage('Đoán sai từ khóa, Verity nghe thấy!'); }
+    return;
+  }
   if(modalMode!=='code') return;
   const v=$('mi').value; if(!v.trim()) return;
   const D=DOORS[door];
@@ -1653,6 +1726,8 @@ $('b2').onclick=()=>{
   hints--; hintShown[k]=true; $('fb').textContent=''+q.hint; updateHud();
 };
 $('mi').addEventListener('keydown',e=>{if(e.key==='Enter')submit();});
+$('mi').addEventListener('input',()=>{if(modalMode==='puz')showBlanks();});
+$('pz').onclick=()=>{openPuzzle();};
 
 // ---------- Luồng game ----------
 function startRoom(){
@@ -1845,8 +1920,8 @@ function act(){
   else if(cur.kind==='clue'){ if(!solved[cur.idx]) openQ(cur.idx); }
   else if(cur.kind==='door'){
     if(doorOpen) return;
-    if(totalPieces()>=PIECES){ doorOpen=true; sGood(); tone(70,1.2,'sawtooth',.12,40); banner('Cổng thoát đã mở! Chạy ra ngoài, nhanh lên!',3200); }
-    else banner('Cổng bị khóa. Cần đủ '+PIECES+' mảnh ghép ('+totalPieces()+'/'+PIECES+').',2200);
+    if(keySolved){ doorOpen=true; sGood(); tone(70,1.2,'sawtooth',.12,40); banner('Cổng thoát đã mở! Chạy ra ngoài, nhanh lên!',3200); }
+    else banner('Cổng bị khóa. Hãy đoán đúng từ khóa của bức tranh (phím P). Đang có '+totalPieces()+'/'+PIECES+' mảnh.',2600);
   }
 }
 
@@ -1999,6 +2074,7 @@ addEventListener('keydown',e=>{
   if(intro.on){ if(e.code==='Enter') introEnd(); return; }   // đang tỉnh dậy: khóa điều khiển, Enter để bỏ qua
   if(e.code==='KeyE'&&state==='play'&&!transitioning) act();
   if(e.code==='KeyF'&&!e.repeat) toggleFlash();
+  if(e.code==='KeyP'&&!e.repeat&&state==='play'&&!transitioning) openPuzzle();
   if(['ArrowUp','ArrowDown','ArrowLeft','ArrowRight','Space'].includes(e.code)) e.preventDefault();
 });
 addEventListener('keyup',e=>{keys[e.code]=false;});
@@ -2035,7 +2111,7 @@ function setMute(v){
 }
 $('mu').onclick=()=>setMute(!MUTED); setMute(MUTED);
 $('fs').onclick=()=>{try{if(document.fullscreenElement)document.exitFullscreen();else document.documentElement.requestFullscreen();}catch(e){}};
-if(!document.documentElement.requestFullscreen){ $('fs').style.display='none'; $('mu').style.right='10px'; }   // iPhone không hỗ trợ toàn màn hình
+if(!document.documentElement.requestFullscreen){ $('fs').style.display='none'; $('mu').style.right='10px'; $('pz').style.right='74px'; }   // iPhone không hỗ trợ toàn màn hình
 
 // ----- Điều khiển cảm ứng: cần gạt trái = đi, vuốt phải = nhìn, nút E = tương tác, nút CHẠY = chạy -----
 const joy={x:0,y:0}; let touchRun=false, joyId=null, joyOX=0, joyOY=0, lookId=null, lookX=0, lookY=0;
@@ -2101,7 +2177,7 @@ const BATS=Array.from({length:9},()=>({x:Math.random()*IMW,y:30+Math.random()*15
 const MRAIN=Array.from({length:220},()=>({x:Math.random(),y:Math.random(),v:1.1+Math.random()*.9,l:.025+Math.random()*.03}));
 let mBolt=null, mLastBolt=0;
 function menuBg(dt,on){
-  mbg.style.display=on?'block':'none'; $('hud').style.display=on?'none':'';
+  mbg.style.display=on?'block':'none'; $('hud').style.display=on?'none':''; if(on) $('pz').style.display='none';
   if(!on) return;
   const w=STW,h=STH; if(mfx.width!==w||mfx.height!==h){mfx.width=w;mfx.height=h;}
   const sc=Math.max(w/IMW,h/IMH), ox=(w-IMW*sc)/2, oy=(h-IMH*sc)/2, g=mctx;
@@ -2375,7 +2451,7 @@ function update(dt){
       const dx=o.x-px,dzz=o.z-pz,d=Math.hypot(dx,dzz);
       if(d<o.r&&(dx*fxv+dzz*fzv)/(d||1)>0.35&&d<best){best=d;cur=o;}
     }
-    if(cur) txt=cur.kind==='hide'?(cur.type==='bed'?'[E] Chui xuống gầm bàn bóng bàn':'[E] Trốn vào bụi cây'):cur.kind==='door'?(totalPieces()>=PIECES?'[E] Mở cổng thoát':'[E] Cổng thoát (cần đủ mảnh ghép)'):'[E] Lấy mảnh ghép (nhìn hình đoán)';
+    if(cur) txt=cur.kind==='hide'?(cur.type==='bed'?'[E] Chui xuống gầm bàn bóng bàn':'[E] Trốn vào bụi cây'):cur.kind==='door'?(keySolved?'[E] Mở cổng thoát':'[E] Cổng thoát (cần đoán đúng từ khóa)'):'[E] Lấy mảnh ghép (nhìn hình đoán)';
   }
   const p=$('prompt'); p.style.display=txt?'block':'none'; p.textContent=txt;
 
@@ -2463,6 +2539,7 @@ _html = (GAME_HTML.replace("__DATA__", build_data())
          .replace("__POOL__", build_pool())
          .replace("__FIXED__", build_fixed())
          .replace("__BONUS__", build_bonus())
+         .replace("__PUZ__", build_puz())
          .replace("__MENUBG__", MENU_BG)
          .replace("__MUSIC__", load_mp3(MUSIC_FILE, PLAY_MUSIC_FILE, True))
          .replace("__MUSIC2__", load_mp3(PLAY_MUSIC_FILE))
