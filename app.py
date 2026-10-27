@@ -376,7 +376,7 @@ GAME_HTML = r"""
 
 <div id="story" class="ov">
   <div class="sty">
-    <p>Bạn bị nhốt lại trong trường vào ban đêm. Tìm <b class="cl">3 MANH MỐI PHÁT SÁNG</b> mỗi khu và <b>trả lời câu hỏi bài tập</b> để mở cửa.</p>
+    <p>Bạn bị nhốt lại trong trường vào ban đêm. Chạy khắp các khu của trường, tìm <b class="cl">15 MẢNH GHÉP PHÁT SÁNG</b>. Mỗi mảnh phải <b>trả lời đúng một câu hỏi</b> mới lấy được. Đủ mảnh thì <b>cổng thoát</b> sẽ mở.</p>
     <p>Cô giáo ma <b>VERITY</b> sẽ đuổi theo bạn, kể cả khi bạn đang trả lời. <b>Trả lời sai, cô ấy lao tới gần hơn.</b> Trốn trong <b>tủ</b> hoặc <b>gầm giường</b> (<kbd>E</kbd>).</p>
   </div>
   <div class="mb"><button id="sgo">BẮT ĐẦU</button></div>
@@ -393,16 +393,16 @@ GAME_HTML = r"""
       <li>Khi tắt Shift Lock: giữ chuột trái hoặc phải rồi kéo để nhìn</li>
       <li><kbd>A</kbd><kbd>B</kbd><kbd>C</kbd><kbd>D</kbd> hoặc bấm chuột: chọn đáp án khi trả lời câu hỏi</li>
       <li>Giữ <kbd>Space</kbd>: chạy</li>
-      <li><kbd>F</kbd>: bật / tắt <b>đèn pin</b>. Thỉnh thoảng cả phòng sẽ <b>mất điện</b> trong ít giây, chỉ còn đèn pin và các manh mối phát sáng</li>
+      <li><kbd>F</kbd>: bật / tắt <b>đèn pin</b>. Thỉnh thoảng cả phòng sẽ <b>mất điện</b> trong ít giây, chỉ còn đèn pin và các mảnh ghép phát sáng</li>
       <li><b>Điện thoại</b> (nên xoay ngang): cần gạt bên trái màn hình để đi, vuốt bên phải để nhìn, nút <kbd>E</kbd> để tương tác, giữ nút <kbd>CHẠY</kbd> để chạy</li>
-      <li><kbd>E</kbd>: tương tác (xem manh mối, mở cửa, trốn vào tủ / gầm giường)</li>
+      <li><kbd>E</kbd>: tương tác (lấy mảnh ghép, mở cổng thoát, trốn vào tủ / gầm bàn)</li>
       <li><kbd>Esc</kbd>: đóng bảng câu hỏi</li>
     </ul>
     <h3>Mục tiêu</h3>
     <ul>
-      <li>Mỗi phòng có <b>3 manh mối</b> phát sáng nhấp nháy 3 giây một lần. Trả lời <b>câu hỏi trắc nghiệm A/B/C/D</b> để lấy 3 chữ số (chìa khóa).</li>
-      <li>Ghép các chữ số theo đúng thứ tự gợi ý rồi nhập mật mã vào <b>cánh cửa</b> để sang phòng tiếp theo.</li>
-      <li>Có 5 cánh cửa. Chọn sai đáp án hoặc nhập sai mật mã sẽ mất 1 (có 3 ).</li>
+      <li>Trường có <b>5 khu</b> thông nhau, cứ đi tự do qua lại giữa các khu. Mỗi khu giấu <b>3 mảnh ghép</b> phát sáng (tổng 15). Trả lời đúng <b>câu hỏi trắc nghiệm A/B/C/D</b> để nhặt mảnh ghép.</li>
+      <li>Không có qua màn: nhặt đủ 15 mảnh theo thứ tự tùy bạn, rồi chạy tới <b>cổng thoát</b> ở khu cuối cùng của trường.</li>
+      <li>Chọn sai đáp án sẽ mất 1 (có 3 ).</li>
     </ul>
     <h3>Verity – cô giáo ma</h3>
     <ul>
@@ -410,7 +410,7 @@ GAME_HTML = r"""
       <li>Hãy <b>trốn ngay</b> vào <b>tủ quần áo</b> hoặc <b>gầm giường</b> (nhìn vào rồi bấm <kbd>E</kbd>).</li>
       <li>Khi đã trốn, đừng cử động. Verity sẽ đến lục soát rồi bỏ đi. Chỉ ra ngoài khi cô ấy đã đi hẳn.</li>
       <li>Bạn <b>vẫn mở được câu hỏi khi Verity đang đuổi</b>, nhưng lúc đó bạn đứng yên còn cô ấy cứ tiến lại (bảng hiện khoảng cách). <b>Trả lời sai lúc này, Verity sẽ lao tới.</b> Bấm <kbd>Esc</kbd> để thoát ra chạy hoặc trốn.</li>
-      <li>Nếu Verity bắt được, bạn <b>chết</b> và phải <b>chơi lại từ cửa số 1</b>.</li>
+      <li>Nếu Verity bắt được, bạn <b>chết</b> và phải <b>chơi lại từ đầu</b> (mất hết mảnh ghép).</li>
       <li>Những đôi mắt đỏ trong bóng tối sẽ biến mất khi bạn nhìn thẳng vào chúng.</li>
     </ul>
     <p style="text-align:center;color:#8a8a8a;margin-top:14px"><i>Nên đeo tai nghe và tắt đèn phòng.</i></p>
@@ -1176,6 +1176,7 @@ function buildRoom(keep){
   for(let i=0;i<nW;i++){const s=spotsE[(i*3+door)%spotsE.length]; if(inB(s[0],s[2],1.2)) continue; const gp=new THREE.Group();gp.position.set(s[0],s[1],s[2]);
     [-0.2,0.2].forEach(dx=>{const e=new THREE.Mesh(new THREE.SphereGeometry(.07,8,6),eyeMat);e.scale.set(1.4,.8,.5);e.position.x=dx;gp.add(e);});
     room.add(gp);watchers.push({g:gp,t:rnd(0,20),off:rnd(0,6)});}
+  doorOpen=(door<DOORS.length-1);      // cổng giữa các khu luôn mở; cổng thoát (khu cuối) khóa tới khi đủ mảnh ghép
   resetDust();
 }
 function refreshClues(){
@@ -1358,17 +1359,19 @@ function whisper(txt){const w=$('whisper');w.textContent=txt||WH[Math.floor(Math
 // ---------- Tiện ích UI ----------
 function banner(t,ms){const b=$('banner');b.textContent=t;b.style.opacity=1;clearTimeout(bannerT);
   bannerT=setTimeout(()=>b.style.opacity=0,ms||2500);}
+const PIECES=15;      // tổng số mảnh ghép = 5 khu x 3 câu
+function totalPieces(){let n=solved.filter(Boolean).length; rooms.forEach((r,j)=>{ if(r&&j!==door) n+=r.solved.filter(Boolean).length; }); return n;}
 function updateHud(){
   $('lockbtn').style.display=(state==='play'&&!touchMode)?'block':'none';
   $('tui').style.display=(touchMode&&state==='play')?'block':'none';
   $('lowhp').className=(hp===1&&state==='play')?'pulse':'';
   if(door>=DOORS.length) return;
   const D=DOORS[door];
-  $('dn').textContent='Cửa '+(door+1)+'/5';
+  $('dn').textContent=D.name;
   $('hp').innerHTML='MẠNG '+'<span style="color:#d01a1a">&#9829;</span>'.repeat(Math.max(hp,0))+'<span style="color:#4a4a4a">&#9829;</span>'.repeat(MAX_HP-Math.max(hp,0));
   $('hn').textContent='Gợi ý: '+hints;
-  $('ks').textContent='Chìa khóa: '+D.questions.map((q,i)=>solved[i]?q.digit:'_').join(' · ');
-  $('ot').textContent=solved.every(Boolean)?D.order_text:'';
+  {const n=totalPieces(); $('ks').textContent='Mảnh ghép: '+'■'.repeat(n)+'□'.repeat(PIECES-n)+'  '+n+'/'+PIECES;}
+  $('ot').textContent=totalPieces()>=PIECES?('Đủ mảnh ghép! Chạy tới cổng thoát ở: '+DOORS[DOORS.length-1].name):'';
   $('lockbtn').className=shiftLock?'on':''; $('lockbtn').textContent='SL';
   $('lockbtn').style.display=(state==='play'&&!touchMode)?'block':'none';
   $('lowhp').className=(hp===1&&state==='play')?'pulse':'';
@@ -1420,7 +1423,7 @@ function damage(msg){
   hp--; shake=0.3; sBad();
   const f=$('flash'); f.style.background='#a00'; f.style.opacity=.75; setTimeout(()=>f.style.opacity=0,350);
   banner(msg+'  -1 mạng',2500); updateHud();
-  if(hp<=0) gameOver('Bạn gục ngã ở cửa số '+(door+1)+'...\nBạn phải bắt đầu lại từ cửa số 1.');
+  if(hp<=0) gameOver('Bạn gục ngã ở '+DOORS[door].name+'...\nBạn phải tìm lại các mảnh ghép từ đầu.');
 }
 function gameOver(msg){
   state='over'; closeModal(true); syncLock(); updateHud(); parkGhost();
@@ -1479,7 +1482,7 @@ function choose(k){
   const q=DOORS[door].questions[modalIdx];
   if(optOrder[k]===0){
     solved[modalIdx]=true; sGood(); closeModal(); refreshClues(); updateHud();
-    banner('Đúng! Chìa khóa '+(modalIdx+1)+' = '+q.digit+(solved.every(Boolean)?'\nĐã đủ chìa! Hãy ra mở cửa.':''),3000);
+    {const n=totalPieces(); banner('Đúng! Nhặt được mảnh ghép '+n+'/'+PIECES+(n>=PIECES?'\nĐã đủ! Chạy tới cổng thoát ở '+DOORS[DOORS.length-1].name+'!':''),3200);}
   } else {
     wrongSet[k]=true; $('opts').children[k].classList.add('bad'); $('fb').textContent='Sai rồi!';
     verityAngry(); damage('Verity trừng phạt câu trả lời sai!');
@@ -1511,8 +1514,8 @@ $('mi').addEventListener('keydown',e=>{if(e.key==='Enter')submit();});
 function startRoom(){
   solved=[false,false,false]; buildRoom(); hidden=false; spot.intensity=2.1; $('hide').style.display='none';
   camera.position.set(0,1.6,RD/2-2); yaw=0; pitch=0; lampF=1; dark=0; blackT=0; nextBlack=40+Math.random()*30; flashOn=true; shDur=0; shadowG.visible=false; nextShadow=25+Math.random()*50; parkGhost();
-  ghostTimer=(door===0?24:16)+Math.random()*16; updateHud();
-  const rb=['CỬA '+(door+1)+': '+DOORS[door].name+'\n'+DOORS[door].intro,4500];
+  ghostTimer=(door===0?24:16)+Math.random()*16; updateHud(); setTimeout(prebuildNext,60);
+  const rb=[DOORS[door].name.toUpperCase()+'\n'+DOORS[door].intro+'\nTìm đủ '+PIECES+' mảnh ghép rải khắp trường rồi chạy ra cổng thoát!',5600];
   if(introWant){ introWant=false; introSnd=0; introBegin(); intro.banner=rb; } else banner(rb[0],rb[1]);
 }
 let inStory=false, storyTm=[];
@@ -1653,8 +1656,8 @@ function switchRoom(ni){
   camera.position.z+=(fwd?1:-1)*off;
   door=ni; loadRoomState(target); layoutNeighbors();
   doorLight.intensity=0; hidden=false; $('hide').style.display='none'; parkGhost(); refreshClues();
-  ghostTimer=16+Math.random()*16; updateHud();
-  if(!target.visited){ target.visited=true; banner('CỬA '+(door+1)+': '+DOORS[door].name+'\n'+DOORS[door].intro,4500); }
+  ghostTimer=16+Math.random()*16; updateHud(); setTimeout(prebuildNext,60);
+  if(!target.visited){ target.visited=true; banner(DOORS[door].name.toUpperCase()+'\n'+DOORS[door].intro,3800); }
 }
 function nextRoom(){
   transitioning=true; $('fade').style.opacity=1;
@@ -1684,7 +1687,7 @@ function toggleFlash(){
 function startBlackout(){
   blackD=blackT=35+Math.random()*50; nextBlack=60+Math.random()*90;   // mất điện ~60 giây (35-85) flashOn=true;
   try{ tone(80,.6,'sawtooth',.14,35); noise(.25,.14); }catch(e){}
-  banner('MẤT ĐIỆN!\nDùng đèn pin (F) — manh mối vẫn phát sáng',3200);
+  banner('MẤT ĐIỆN!\nDùng đèn pin (F) — mảnh ghép vẫn phát sáng',3200);
 }
 function endBlackout(){ blackT=0; try{ tone(140,.3,'square',.06,260); }catch(e){} banner('Điện đã có lại.',1800); }
 function act(){
@@ -1695,8 +1698,8 @@ function act(){
   else if(cur.kind==='clue'){ if(!solved[cur.idx]) openQ(cur.idx); }
   else if(cur.kind==='door'){
     if(doorOpen) return;
-    if(solved.every(Boolean)) openCode();
-    else banner('Cửa bị khóa. Cần đủ 3 chìa khóa ('+solved.filter(Boolean).length+'/3).',2200);
+    if(totalPieces()>=PIECES){ doorOpen=true; sGood(); tone(70,1.2,'sawtooth',.12,40); banner('Cổng thoát đã mở! Chạy ra ngoài, nhanh lên!',3200); }
+    else banner('Cổng bị khóa. Cần đủ '+PIECES+' mảnh ghép ('+totalPieces()+'/'+PIECES+').',2200);
   }
 }
 
@@ -1823,7 +1826,7 @@ function updScare(dt){
     if(RF){f.style.transition='opacity .3s';f.style.background='#667';f.style.opacity=.22;}
     else{f.style.transition='none';f.style.background=Math.random()<.4?'#fff':'#8890a0';f.style.opacity=Math.random()<.6?(.3+Math.random()*.6):0;}}
   drawScare(scareT);
-  if(scareT>2.6){ const f=$('flash'); f.style.transition='opacity .45s'; gameOver('Verity đã bắt được bạn.\nCô nói: \"Em trượt rồi.\"\nBạn phải bắt đầu lại từ cửa số 1.'); }
+  if(scareT>2.6){ const f=$('flash'); f.style.transition='opacity .45s'; gameOver('Verity đã bắt được bạn.\nCô nói: \"Em trượt rồi.\"\nBạn phải tìm lại các mảnh ghép từ đầu.'); }
 }
 
 // ---------- Điều khiển ----------
@@ -2178,7 +2181,7 @@ function update(dt){
     if(pb&&camera.position.z>RD/2-0.6) camera.position.x=Math.max(-0.75,Math.min(0.75,camera.position.x));
     if(!transitioning){
       if(doorOpen&&nb){ if(camera.position.z<-RD/2-GAP-.55) switchRoom(door+1); }
-      else if(doorOpen&&camera.position.z<-RD/2-0.3) nextRoom();         // cửa cuối: sang màn thắng
+      else if(doorOpen&&door>=DOORS.length-1&&camera.position.z<-RD/2-0.3) nextRoom();         // cửa cuối: sang màn thắng
       else if(pb&&camera.position.z>RD/2+GAP+.55) switchRoom(door-1);    // đi ngược lại phòng trước
     }
   }
@@ -2213,7 +2216,7 @@ function update(dt){
       const dx=o.x-px,dzz=o.z-pz,d=Math.hypot(dx,dzz);
       if(d<o.r&&(dx*fxv+dzz*fzv)/(d||1)>0.35&&d<best){best=d;cur=o;}
     }
-    if(cur) txt=cur.kind==='hide'?(cur.type==='bed'?'[E] Chui xuống gầm giường':'[E] Trốn vào tủ'):cur.kind==='door'?(solved.every(Boolean)?'[E] Nhập mật mã':'[E] Cửa (bị khóa)'):'[E] Xem manh mối';
+    if(cur) txt=cur.kind==='hide'?(cur.type==='bed'?'[E] Chui xuống gầm bàn giáo viên':'[E] Trốn vào tủ locker'):cur.kind==='door'?(totalPieces()>=PIECES?'[E] Mở cổng thoát':'[E] Cổng thoát (cần đủ mảnh ghép)'):'[E] Lấy mảnh ghép (trả lời câu hỏi)';
   }
   const p=$('prompt'); p.style.display=txt?'block':'none'; p.textContent=txt;
 
