@@ -341,7 +341,7 @@ GAME_HTML = r"""
 <div id="stage"><div id="c"></div><div id="mbg"><div id="mimg"></div><div id="msky"></div><canvas id="mfx"></canvas><div id="mfl"></div></div><div id="ui">
 <div id="vig"></div><canvas id="grain"></canvas><div id="lowhp"></div>
 <div id="cross"></div>
-<div id="hud"><div id="dn"></div><div id="hp"></div><div id="hn"></div><div id="ks"></div><div id="ot"></div></div>
+<div id="hud"><div id="dn"></div><div id="hp"></div><div id="hn"></div><div id="ks"></div><div id="ot"></div><div id="stw" style="width:150px;height:8px;border:1px solid #7a2a2a;background:rgba(0,0,0,.55);margin-top:5px"><div id="stb" style="height:100%;width:100%;background:#d9b45a"></div></div></div>
 <div id="help">WASD / ←→: di chuyển · Kéo chuột: nhìn · Shift: Shift Lock · Giữ Space: chạy · F: đèn pin · E: tương tác · A/B/C/D: chọn đáp án · Esc: đóng</div>
 <button id="fs" title="Toàn màn hình">FULL</button><button id="mu" title="Bật / tắt âm thanh">🔊</button>
 <button id="lockbtn" title="Shift Lock (phím Shift)">SL</button>
@@ -408,7 +408,7 @@ GAME_HTML = r"""
       <li><kbd>Shift</kbd> hoặc nút SL góc phải dưới: bật / tắt <b>Shift Lock</b> giống Roblox — chuột bị khóa ở giữa màn hình, hiện tâm ngắm, xoay camera mà không cần bấm chuột. Lỡ nhả chuột (Esc) thì bấm vào màn hình để khóa lại</li>
       <li>Khi tắt Shift Lock: giữ chuột trái hoặc phải rồi kéo để nhìn</li>
       <li><kbd>A</kbd><kbd>B</kbd><kbd>C</kbd><kbd>D</kbd> hoặc bấm chuột: chọn đáp án khi trả lời câu hỏi</li>
-      <li>Giữ <kbd>Space</kbd>: chạy</li>
+      <li>Giữ <kbd>Space</kbd>: chạy. Chạy lâu sẽ <b>hết thể lực</b> (thanh vàng dưới HUD), phải đi bộ hoặc đứng nghỉ một lúc mới chạy tiếp được</li>
       <li><kbd>F</kbd>: bật / tắt <b>đèn pin</b>. Thỉnh thoảng cả sân trường sẽ <b>mất điện</b> trong ít giây, chỉ còn đèn pin và các mảnh ghép phát sáng</li>
       <li><b>Điện thoại</b> (nên xoay ngang): cần gạt bên trái màn hình để đi, vuốt bên phải để nhìn, nút <kbd>E</kbd> để tương tác, giữ nút <kbd>CHẠY</kbd> để chạy</li>
       <li><kbd>E</kbd>: tương tác (lấy mảnh ghép, mở cổng thoát, trốn vào bụi cây / gầm bàn bóng bàn)</li>
@@ -505,7 +505,7 @@ let RF=loadNum('doors_rf',0,0,1)===1;   // giảm hiệu ứng chớp sáng
 let hp=MAX_HP, hints=HINTS0, door=0, solved=[false,false,false], hintShown={};
 let state='menu', modalOpen=false, modalMode='q', modalIdx=0, hidden=false, doorOpen=false, transitioning=false;
 let yaw=0, pitch=0, dragging=false, shake=0, bob=0, bannerT=null, cur=null, curSpot=null, spots=[];
-let flashOn=true, blackT=0, blackD=1, nextBlack=40+Math.random()*30;   // đèn pin + mất điện
+let stam=100, tired=false, flashOn=true, blackT=0, blackD=1, nextBlack=40+Math.random()*30;   // đèn pin + mất điện
 let keys={}, tt=0, stepT=0, hbT=0, evT=14, flickT=0, nextFlick=12, lampF=1, dark=0;
 let shiftLock=false, expectUnlock=false, scareT=0, scareYaw=0, ghostTimer=40, scareFlashT=0;
 let doorGlow=null; const GAP=.2, rooms=[];   // rooms[i]: phòng KỀ BÊN đã dựng (không phải phòng hiện tại), dùng để nhìn xuyên cửa và đi qua lại
@@ -1646,7 +1646,7 @@ function storyIntro(){            // bảng cốt truyện: tắt nhạc, hiệu
 function showOnly(id){['menu','story','howto','settings','over','win'].forEach(i=>$(i).style.display=(i===id?'flex':'none'));
   inStory=(id==='story'); if(inStory) storyIntro(); else storyStop();}
 let introWant=false;
-function resetGame(){rollGame();introWant=true;musicStop();hp=MAX_HP;hints=HINTS0;door=0;hintShown={};state='play';ambience();playMusicStart();
+function resetGame(){stam=100;tired=false;rollGame();introWant=true;musicStop();hp=MAX_HP;hints=HINTS0;door=0;hintShown={};state='play';ambience();playMusicStart();
   camera.fov=72;camera.updateProjectionMatrix();$('scare').style.display='none';
   showOnly(''); startRoom(); syncLock();}
 function toMenu(){playMusicStop();state='menu';closeModal(true);syncLock();parkGhost();showOnly('menu');buildRoom();camera.position.set(0,1.6,RD/2-2);yaw=0;pitch=0;musicStart();}
@@ -2283,13 +2283,13 @@ function update(dt){
     const eb=.94, f=v=>Math.abs(v)>eb?Math.sign(v)*(Math.abs(v)-eb)/(1-eb):0;
     yaw-=f(mouseX)*2.6*dt; pitch=Math.max(-1.3,Math.min(1.3,pitch-f(mouseY)*1.6*dt));
   }
-  let moving=false;
+  let moving=false, ranNow=false;
   if(!modalOpen&&!hidden&&!transitioning&&!intro.on){
     let f=0,s=0;
     if(keys.KeyW||keys.ArrowUp)f++; if(keys.KeyS||keys.ArrowDown)f--; if(keys.KeyD)s++; if(keys.KeyA)s--;
     if(touchMode&&joyId!==null){f-=joy.y; s+=joy.x;}
     if(f||s){
-      moving=true; const run=keys.Space||touchRun, sp=(run?5.2:3.2)*dt, l=Math.hypot(f,s), mag=Math.min(1,l);
+      moving=true; const run=(keys.Space||touchRun)&&!tired&&stam>0; ranNow=run; const sp=(run?5.2:3.2)*dt, l=Math.hypot(f,s), mag=Math.min(1,l);
       const fx=-Math.sin(yaw),fz=-Math.cos(yaw),rx=Math.cos(yaw),rz=-Math.sin(yaw);
       const dx=(fx*f+rx*s)/l*sp*mag, dzz=(fz*f+rz*s)/l*sp*mag;
       if(!hit(camera.position.x+dx,camera.position.z)) camera.position.x+=dx;
@@ -2311,6 +2311,9 @@ function update(dt){
       else if(pb&&camera.position.z>RD/2+GAP+.55) switchRoom(door-1);    // đi ngược lại phòng trước
     }
   }
+  if(ranNow){ stam=Math.max(0,stam-dt*14); if(stam<=0&&!tired){ tired=true; banner('HẾT SỨC! Đi bộ hoặc đứng nghỉ để lấy lại sức.',2200); try{noise(.6,.1); tone(110,.5,'sine',.06,70);}catch(e){} } }
+  else{ stam=Math.min(100,stam+dt*(moving?9:18)); if(tired&&stam>=30){ tired=false; } }
+  if(state==='play'){ const sb=$('stb'); sb.style.width=stam.toFixed(0)+'%'; sb.style.background=tired?'#b3141a':(stam<30?'#d98a3a':'#d9b45a'); }
   if(hidden&&curSpot){
     if(curSpot.type==='ward'){ yaw=curSpot.yaw; pitch=0; }       // trốn trong tủ: chỉ nhìn qua khe hở, không xoay camera được
     else { yaw=Math.max(curSpot.yaw-.75,Math.min(curSpot.yaw+.75,yaw)); pitch=Math.max(-.35,Math.min(.4,pitch)); }
