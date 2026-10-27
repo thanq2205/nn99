@@ -57,11 +57,11 @@ SCHOOL_QS = [
 ]
 
 _ROOMS = [   # thứ tự = kiểu khu 3D: 0 sân cờ, 1 dãy lớp học, 2 sân bóng, 3 vườn cây phượng, 4 cổng trường
-    ("Sảnh chính", "Sảnh trường rộng mênh mông, sàn gạch ướt mưa. Tiếng bước chân vang vọng trong bóng tối..."),
-    ("Hành lang lớp học", "Hành lang dài hun hút, cửa lớp khép chặt hai bên. Có tiếng thì thầm: 'Trả lời đi...'"),
-    ("Nhà thi đấu", "Nhà thi đấu trống trải, hai khung thành lạnh lẽo. Verity đang ở đâu đó gần đây..."),
-    ("Căn tin", "Căn tin rộng với những hàng cột bê tông. Có thứ gì đó đang di chuyển..."),
-    ("Sảnh cổng", "Cổng sắt đã khóa. Verity đang đứng đợi ngay bên cạnh..."),
+    ("Sân cờ", "Cột cờ lặng gió giữa đêm. Các dãy lớp học xung quanh tối om, cửa sổ đen kịt..."),
+    ("Dãy lớp học", "Cửa lớp khép chặt, ghế đá ướt mưa dưới hành lang. Có tiếng thì thầm: 'Trả lời đi...'"),
+    ("Sân bóng", "Sân bóng giữa đêm, hai khung thành trống trơn. Verity đang ở đâu đó gần đây..."),
+    ("Vườn cây phượng", "Hàng cây đung đưa trong bóng tối. Có thứ gì đó đang di chuyển..."),
+    ("Cổng trường", "Cổng sắt đã khóa. Verity đang đứng đợi ngay bên cạnh..."),
 ]
 DOORS = [
     {"name": n, "intro": t, "order": [0, 1, 2], "order_text": "Ghép chìa 1 → chìa 2 → chìa 3.",
@@ -392,8 +392,8 @@ GAME_HTML = r"""
 
 <div id="story" class="ov">
   <div class="sty">
-    <p>Bạn bị nhốt lại trong ngôi trường bỏ hoang giữa đêm bão. Chạy khắp các khu của trường, tìm <b class="cl">15 MẢNH GHÉP PHÁT SÁNG</b>. Mỗi mảnh phải <b>trả lời đúng một câu hỏi</b> mới lấy được. Đủ mảnh thì <b>cổng thoát</b> sẽ mở.</p>
-    <p>Cô giáo ma <b>VERITY</b> luôn rình rập khi bạn trả lời câu hỏi. <b>Trả lời sai, cô ấy sẽ tới sớm hơn.</b> Trốn trong <b>tủ đồ</b> hoặc <b>gầm bàn bóng bàn</b> (<kbd>E</kbd>).</p>
+    <p>Bạn bị nhốt lại ở sân trường giữa đêm bão. Chạy khắp các khu của trường, tìm <b class="cl">15 MẢNH GHÉP PHÁT SÁNG</b>. Mỗi mảnh phải <b>trả lời đúng một câu hỏi</b> mới lấy được. Đủ mảnh thì <b>cổng thoát</b> sẽ mở.</p>
+    <p>Cô giáo ma <b>VERITY</b> luôn rình rập khi bạn trả lời câu hỏi. <b>Trả lời sai, cô ấy sẽ tới sớm hơn.</b> Trốn trong <b>bụi cây</b> hoặc <b>gầm bàn bóng bàn</b> (<kbd>E</kbd>).</p>
   </div>
   <div class="mb"><button id="sgo">BẮT ĐẦU</button></div>
 </div>
@@ -409,21 +409,21 @@ GAME_HTML = r"""
       <li>Khi tắt Shift Lock: giữ chuột trái hoặc phải rồi kéo để nhìn</li>
       <li><kbd>A</kbd><kbd>B</kbd><kbd>C</kbd><kbd>D</kbd> hoặc bấm chuột: chọn đáp án khi trả lời câu hỏi</li>
       <li>Giữ <kbd>Space</kbd>: chạy</li>
-      <li><kbd>F</kbd>: bật / tắt <b>đèn pin</b>. Thỉnh thoảng cả ngôi trường sẽ <b>mất điện</b> trong ít giây, chỉ còn đèn pin và các mảnh ghép phát sáng</li>
+      <li><kbd>F</kbd>: bật / tắt <b>đèn pin</b>. Thỉnh thoảng cả sân trường sẽ <b>mất điện</b> trong ít giây, chỉ còn đèn pin và các mảnh ghép phát sáng</li>
       <li><b>Điện thoại</b> (nên xoay ngang): cần gạt bên trái màn hình để đi, vuốt bên phải để nhìn, nút <kbd>E</kbd> để tương tác, giữ nút <kbd>CHẠY</kbd> để chạy</li>
-      <li><kbd>E</kbd>: tương tác (lấy mảnh ghép, mở cổng thoát, trốn vào tủ đồ / gầm bàn bóng bàn)</li>
+      <li><kbd>E</kbd>: tương tác (lấy mảnh ghép, mở cổng thoát, trốn vào bụi cây / gầm bàn bóng bàn)</li>
       <li><kbd>Esc</kbd>: đóng bảng câu hỏi</li>
     </ul>
     <h3>Mục tiêu</h3>
     <ul>
-      <li>Ngôi trường có <b>5 khu</b> thông nhau, cứ đi tự do qua lại giữa các khu. Mỗi khu giấu <b>3 mảnh ghép</b> phát sáng (tổng 15). Trả lời đúng <b>câu hỏi trắc nghiệm A/B/C/D</b> để nhặt mảnh ghép.</li>
+      <li>Sân trường có <b>5 khu</b> thông nhau, cứ đi tự do qua lại giữa các khu. Mỗi khu giấu <b>3 mảnh ghép</b> phát sáng (tổng 15). Trả lời đúng <b>câu hỏi trắc nghiệm A/B/C/D</b> để nhặt mảnh ghép.</li>
       <li>Không có qua màn: nhặt đủ 15 mảnh theo thứ tự tùy bạn, rồi chạy tới <b>cổng thoát</b> ở khu cuối cùng của trường.</li>
       <li>Chọn sai đáp án sẽ mất 1 (có 3 ).</li>
     </ul>
     <h3>Verity – cô giáo ma</h3>
     <ul>
       <li>Thỉnh thoảng <b>đèn sẽ chớp liên tục</b>. Đó là dấu hiệu <b>Verity</b> sắp xuất hiện. Trả lời sai sẽ làm cô ấy <b>đến sớm hơn</b>.</li>
-      <li>Hãy <b>trốn ngay</b> vào <b>tủ đồ</b> hoặc <b>gầm bàn bóng bàn</b> (nhìn vào rồi bấm <kbd>E</kbd>).</li>
+      <li>Hãy <b>trốn ngay</b> vào <b>bụi cây</b> hoặc <b>gầm bàn bóng bàn</b> (nhìn vào rồi bấm <kbd>E</kbd>).</li>
       <li>Khi đã trốn, đừng cử động. Verity sẽ đến lục soát rồi bỏ đi. Chỉ ra ngoài khi cô ấy đã đi hẳn.</li>
       <li>Khi Verity xuất hiện, bảng câu hỏi sẽ <b>tự đóng</b> để bạn chạy hoặc trốn. Chọn sai đáp án sẽ gọi cô ấy <b>đến sớm hơn</b>.</li>
       <li>Nếu Verity bắt được, bạn <b>chết</b> và phải <b>chơi lại từ đầu</b> (mất hết mảnh ghép).</li>
@@ -482,7 +482,7 @@ function rollGame(){
 const MUSIC_SRC = "__MUSIC__";
 const PLAY_SRC = "__MUSIC2__";
 const MAX_HP=3, HINTS0=5, RH=4;
-const SIZES=[[30,46],[34,50],[36,52],[32,48],[34,50]];
+const SIZES=[[34,50],[38,54],[40,56],[36,52],[38,54]];
 let RW=18, RD=26;
 const $=id=>document.getElementById(id);
 const SRC='<!DOCTYPE html>\n'+document.documentElement.outerHTML;   // bản sao trang để mở ở tab mới
@@ -529,7 +529,7 @@ scene.background=new THREE.Color(0x070b14);
   const sky=new THREE.Mesh(new THREE.SphereGeometry(60,24,12),new THREE.MeshBasicMaterial({map:new THREE.CanvasTexture(c),side:THREE.BackSide,fog:false,depthWrite:false}));
   sky.renderOrder=-1; scene.add(sky); }
 scene.fog=new THREE.FogExp2(0x050912,0.045);
-const camera=new THREE.PerspectiveCamera(72,16/9,0.1,100);
+const camera=new THREE.PerspectiveCamera(72,16/9,0.1,110);
 camera.rotation.order='YXZ';
 scene.add(camera);
 // Khung 16:9 luôn nằm gọn trong màn hình (letterbox), giao diện scale theo khung
@@ -552,9 +552,9 @@ spot.shadow.mapSize.set(1024,1024); spot.shadow.camera.near=0.2; spot.shadow.cam
 const ambL=new THREE.AmbientLight(0x34456a,0.8); scene.add(ambL);   // ánh trăng xanh lạnh ban đêm
 const moonL=new THREE.DirectionalLight(0x7f95c8,0.28); moonL.position.set(-8,20,6); scene.add(moonL);
 // Các đèn cố định (tạo một lần để tránh biên dịch lại shader)
-const lamp=new THREE.PointLight(0xe4eeff,1.1,44); scene.add(lamp);
+const lamp=new THREE.PointLight(0xe4eeff,1.1,46); scene.add(lamp);
 lamp.shadow.mapSize.set(512,512); lamp.shadow.camera.near=0.3; lamp.shadow.camera.far=24; lamp.shadow.bias=-0.003;
-const lampB=new THREE.PointLight(0xe4eeff,0.9,40); scene.add(lampB);
+const lampB=new THREE.PointLight(0xe4eeff,0.9,42); scene.add(lampB);
 const doorLight=new THREE.PointLight(0xfff1c9,0,10); scene.add(doorLight);
 const nextL=new THREE.PointLight(0xffd9a0,0,40), prevL=new THREE.PointLight(0xffc890,0,36); scene.add(nextL); scene.add(prevL);   // chiếu sáng phòng kề bên để nhìn xuyên ô cửa
 const sconceL=[0,1].map((_,i)=>{const l=new THREE.PointLight(0xff9a40,1.0,9);if(i===0)scene.add(l);return l;});   // chỉ giữ 1 đèn phụ trong scene
@@ -592,17 +592,12 @@ const carpetTex=(rx,ry)=>T('carpet',256,256,(g,w,h)=>{      // sân bê tông: k
   g.lineWidth=1;for(let i=0;i<7;i++){g.beginPath();let x=rnd(0,w),y=rnd(0,h);g.moveTo(x,y);for(let k=0;k<5;k++){x+=rnd(-30,30);y+=rnd(-30,30);g.lineTo(x,y);}g.stroke();}
   for(let i=0;i<18;i++){g.fillStyle='rgba(60,110,50,'+rnd(.1,.3)+')';g.beginPath();g.arc(rnd(0,w),rnd(0,h),rnd(3,12),0,7);g.fill();}
   stains(g,w,h,22,.25);noiseFx(g,w,h,30);},rx,ry);
-const tileTex=(rx,ry)=>T('tile',256,256,(g,w,h)=>{          // sàn gạch hành lang trường học
-  g.fillStyle='#8d9088';g.fillRect(0,0,w,h);
-  for(let i=0;i<4;i++)for(let j=0;j<4;j++){const v=((i+j)%2)*14;g.fillStyle='rgba('+v+','+v+','+v+',.18)';g.fillRect(i*64,j*64,64,64);}
-  g.strokeStyle='rgba(20,22,20,.55)';g.lineWidth=2;for(let k=0;k<=w;k+=64){g.beginPath();g.moveTo(k,0);g.lineTo(k,h);g.stroke();g.beginPath();g.moveTo(0,k);g.lineTo(w,k);g.stroke();}
-  stains(g,w,h,20,.22);noiseFx(g,w,h,18);},rx,ry);
 const grassTex=(rx,ry)=>T('grass',256,256,(g,w,h)=>{          // bãi cỏ
   g.fillStyle='#2c4527';g.fillRect(0,0,w,h);
   for(let i=0;i<900;i++){g.strokeStyle='hsl('+Math.floor(rnd(85,125))+','+Math.floor(rnd(30,50))+'%,'+Math.floor(rnd(14,30))+'%)';const x=rnd(0,w),y=rnd(0,h);g.beginPath();g.moveTo(x,y);g.lineTo(x+rnd(-3,3),y-rnd(3,9));g.stroke();}
   for(let i=0;i<8;i++){g.fillStyle='rgba(70,50,30,'+rnd(.15,.35)+')';g.beginPath();g.ellipse(rnd(0,w),rnd(0,h),rnd(8,20),rnd(5,12),0,0,7);g.fill();}
   noiseFx(g,w,h,22);},rx,ry);
-const leafTex=()=>T('leaf',128,128,(g,w,h)=>{                 // tán lá / tủ đồ
+const leafTex=()=>T('leaf',128,128,(g,w,h)=>{                 // tán lá / bụi cây
   g.fillStyle='#1d3d22';g.fillRect(0,0,w,h);
   for(let i=0;i<160;i++){g.fillStyle='hsl('+Math.floor(rnd(95,135))+','+Math.floor(rnd(35,55))+'%,'+Math.floor(rnd(12,30))+'%)';g.beginPath();g.ellipse(rnd(0,w),rnd(0,h),rnd(3,9),rnd(2,5),rnd(0,3),0,7);g.fill();}
   noiseFx(g,w,h,18);});
@@ -921,7 +916,7 @@ function buildRoom(keep){
   obstacles=[]; inter=[]; watchers=[]; spots=[]; doorOpen=false; curSpot=null; fireMat=null;
   const sz=SIZES[layoutOrder[door%5]]; RW=sz[0]; RD=sz[1];
   const lay=layoutOrder[door%5], hw=RW/2, hd=RD/2, m=mirrorArr[door%5], S1=-m, S2=m;
-  scene.fog=new THREE.FogExp2(0x050912,0.026+door*0.003);
+  scene.fog=new THREE.FogExp2(0x050912,0.024+door*0.003);
   renderer.shadowMap.enabled=HQ; spot.castShadow=HQ; lamp.castShadow=false;
   const R=mulberry(gameSeed+door*7919+17);
   const pick=a=>a[Math.floor(R()*a.length)];
@@ -944,16 +939,17 @@ function buildRoom(keep){
   const wi=wallOrder[door%5];
 
   // sàn, trần, tường
-  plane(RW,RD,new THREE.MeshStandardMaterial({map:lay===2?woodTex(RW/3,RD/3):tileTex(RW/3,RD/3),roughness:.8}),0,0,0,0,-Math.PI/2);
-  plane(RW,RD,new THREE.MeshStandardMaterial({map:ceilTex(RW/4,RD/4),roughness:1}),0,RH,0,0,Math.PI/2);   // trần nhà
+  plane(RW,RD,new THREE.MeshStandardMaterial({map:lay===2?stripeTex(RW/4,RD/4):lay===3?grassTex(RW/3,RD/3):carpetTex(RW/2,RD/2),roughness:1}),0,0,0,0,-Math.PI/2);
   // Tường = dãy nhà lớp học 2 tầng (cửa lớp, cửa sổ tối, hành lang tầng 2, mái ngói); khu sân bóng / vườn / cổng: hai bên là hàng rào + hàng cây
   // Mỗi khu chỉ dùng chung 1 texture cho mọi mặt tường (đỡ tốn bộ nhớ card đồ họa), mặt nào dài hơn thì co giãn UV.
-  const garden=false;
+  const garden=(lay>=2);
   const roofM=M(0x3a1e1a);
-  const facM=lit(facadeTex(wi,1,1));
+  const facM=lit(facadeTex(wi,1,1)), upM=lit(upperTex(wi,1,1));
   let treeM=null, fenM=null;
   const tile=(pl,su,sv)=>{const uv=pl.geometry.attributes.uv;for(let i=0;i<uv.count;i++)uv.setXY(i,uv.getX(i)*su,uv.getY(i)*sv);uv.needsUpdate=true;return pl;};
-  const upperPlane=()=>{};
+  const upperPlane=(len,x,z,ry,nx,nz)=>{
+    tile(plane(len,RH,upM,x,RH*1.5,z,ry),len/8,1);
+    const ax=Math.abs(nz)>.5; box(ax?len:1.1,.3,ax?1.1:len,roofM,x+nx*.45,RH*2+.05,z+nz*.45,null,false); };
   const gardenFace=(len,x,z,ry,nx,nz)=>{
     treeM=treeM||new THREE.MeshStandardMaterial({map:treeLineTex(wi,1,1),alphaTest:.5,roughness:1,side:THREE.DoubleSide});
     fenM=fenM||new THREE.MeshStandardMaterial({map:fenceTex(1,1),alphaTest:.2,roughness:.6,metalness:.3,side:THREE.DoubleSide});
@@ -981,9 +977,12 @@ function buildRoom(keep){
   // đèn chùm
   flameMat=new THREE.MeshBasicMaterial({color:0xf0f6ff});
   const iron=M(0x111111);
-  const chand=(x,z)=>{const pn=new THREE.Mesh(new THREE.BoxGeometry(2.2,.06,.5),flameMat);pn.position.set(x,RH-.04,z);room.add(pn);};   // đèn huỳnh quang trên trần
-  for(let gx=-hw+6;gx<hw-3;gx+=9)for(let gz=-hd+5;gz<hd-3;gz+=9)chand(gx,gz);
-  const lp1=[0,RD*0.18], lp2=[0,-RD*0.25];
+  const chand=(x,z)=>{                                  // cột đèn sân trường
+    cyl(.06,.08,RH-.45,8,iron,x,(RH-.45)/2,z,null,false);box(.6,.07,.32,iron,x,RH-.45,z,null,false);
+    const bulb=new THREE.Mesh(new THREE.SphereGeometry(.13,10,8),flameMat);bulb.position.set(x,RH-.55,z);room.add(bulb);addObs(x,z,.5,.5);};
+  const lp1=lay===2?[hw-1.3,6.5]:[0,RD*0.12], lp2=lay===2?[-(hw-1.3),-7.5]:[0,-RD*0.28];
+  chand(lp1[0],lp1[1]); chand(lp2[0],lp2[1]);
+  [[-hw*.5,-RD*.36],[hw*.5,-RD*.36],[-hw*.5,RD*.36],[hw*.5,RD*.36]].forEach(q=>chand(q[0],q[1]));   // thêm cột đèn cho sân rộng
   lamp.position.set(lp1[0],RH-0.85,lp1[1]); lampB.position.set(lp2[0],RH-0.85,lp2[1]);
 
   // cửa ra
@@ -1012,14 +1011,13 @@ function buildRoom(keep){
   // ---- đồ nội thất (các hàm dựng) ----
   const metalM=M(0x555b63), stoneT=M(0x8d8f88), soilM=M(0x3a2a1c), trunkM=M(0x3b2a1c), netM=M(0xe8e8e8);
   const leafM=new THREE.MeshStandardMaterial({map:leafTex(),roughness:1});
-  const lockM=new THREE.MeshStandardMaterial({color:0x4a6a5a,roughness:.5,metalness:.4,side:THREE.DoubleSide});
   const darkWinM=new THREE.MeshBasicMaterial({color:0x080d12}), litWinM=new THREE.MeshBasicMaterial({color:0xcdb86a});
   const blob=(x,y,z,r,parent)=>{const f=new THREE.Mesh(new THREE.SphereGeometry(r,10,8),leafM);f.position.set(x,y,z);(parent||room).add(f);return f;};
-  let pillar=(x,z)=>{box(.7,RH,.7,stoneT,x,RH/2,z);addObs(x,z,.9,.9);};   // cột bê tông
+  let pillar=(x,z)=>{cyl(.2,.3,3.4,8,trunkM,x,1.7,z);blob(x,3.9,z,1.5);blob(x+.7,3.4,z+.4,1.05);blob(x-.6,3.5,z-.5,1.1);addObs(x,z,.8,.8);};   // cây phượng
   let table=(x,z,sx,sz2,h)=>{box(sx,.08,sz2,stoneT,x,h,z);                                              // bàn đá
     [-1,1].forEach(s2=>box(.16,h,Math.max(.3,sz2-.3),stoneT,x+s2*(sx/2-.25),h/2,z));addObs(x,z,sx,sz2);};
   let chair=(x,z,ry)=>{cyl(.22,.22,.46,10,stoneT,x,.23,z,null,false);};                                  // ghế đá tròn
-  let shelf=(x,z,fx,fz,len)=>{const gp=grp(x,z,fx,fz);box(len,2.0,.5,lockM,0,1.0,0,gp);for(let k=-len/2+.4;k<len/2;k+=.8)box(.02,1.9,.02,black,k,1.0,.27,gp,false);   // dãy tủ khóa
+  let shelf=(x,z,fx,fz,len)=>{const gp=grp(x,z,fx,fz);box(len,.35,.55,stoneT,0,.175,0,gp);box(len-.1,1.05,.5,leafM,0,.85,0,gp);   // luống cây xén
     const d=dims(fx,fz,len,.55);addObs(x,z,d[0],d[1]);};
   let clock=(x,z,fx,fz)=>{const gp=grp(x,z,fx,fz);[-.32,.32].forEach(dx=>box(.07,2.1,.07,metalM,dx,1.05,0,gp,false));   // bảng tin dựng đứng
     box(.8,1.15,.05,M(0x9a7448),0,1.55,.03,gp,false);
@@ -1039,12 +1037,12 @@ function buildRoom(keep){
     const d=dims(fx,fz,2.2,1);addObs(x,z,d[0],d[1]);};
   let barrel=(x,z)=>{cyl(.3,.26,.8,12,M(0x4d5a5a),x,.4,z);cyl(.32,.32,.05,12,metalM,x,.82,z,null,false);addObs(x,z,.7,.7);};   // thùng rác
   let crate=(x,z,s,ry)=>{const b=box(s,s,s,woodMid,x,s/2,z);b.rotation.y=ry||0;addObs(x,z,s*1.2,s*1.2);};
-  const flagpole=(x,z)=>{cyl(.06,.08,3.2,8,metalM,x,1.6,z,null,false);cyl(.4,.45,.18,12,stoneT,x,.09,z);               // cột cờ
+  const flagpole=(x,z)=>{cyl(.06,.08,6.0,8,metalM,x,3.0,z,null,false);cyl(.4,.45,.18,12,stoneT,x,.09,z);               // cột cờ
     const fl=new THREE.Mesh(new THREE.PlaneGeometry(1.5,1.0),new THREE.MeshStandardMaterial({map:flagTex(),side:THREE.DoubleSide,roughness:1}));
-    fl.position.set(x+.8,2.7,z);room.add(fl);addObs(x,z,.9,.9);};
-  let wardrobe=(x,z,fx,fz)=>{const gp=grp(x,z,fx,fz);                                                     // tủ đồ rậm (chỗ trốn)
-    box(1.5,2.4,.95,lockM,0,1.2,0,gp);
-    const dL=box(.72,2.2,.03,lockM,-.37,1.25,.49,gp,false), dR=box(.72,2.2,.03,lockM,.37,1.25,.49,gp,false), dS=box(.03,2.2,.04,black,0,1.25,.49,gp,false);
+    fl.position.set(x+.8,5.2,z);room.add(fl);addObs(x,z,.9,.9);};
+  let wardrobe=(x,z,fx,fz)=>{const gp=grp(x,z,fx,fz);                                                     // bụi cây rậm (chỗ trốn)
+    box(1.5,2.4,.95,leafM,0,1.2,0,gp);blob(-.45,2.5,0,.55,gp);blob(.45,2.55,.1,.55,gp);blob(0,2.7,-.1,.55,gp);
+    const dL=box(.72,2.2,.03,leafM,-.37,1.25,.49,gp,false), dR=box(.72,2.2,.03,leafM,.37,1.25,.49,gp,false), dS=box(.03,2.2,.04,black,0,1.25,.49,gp,false);
     const d=dims(fx,fz,1.5,.95);addObs(x,z,d[0],d[1]);
     const sp={kind:'hide',type:'ward',x,z,r:2.6,fx,fz,hx:x,hz:z,hy:1.5,yaw:Math.atan2(-fx,-fz),ex:x+fx*1.5,ez:z+fz*1.5,gd:2.4,bend:.85,sink:0,doors:[dL,dR,dS]};
     inter.push(sp);spots.push(sp);};
@@ -1130,7 +1128,7 @@ function buildRoom(keep){
 
   switch(lay){
 
-  // ===== KHU 1: SÂN CỜ — cột cờ, 4 cây phượng, cột bóng rổ, tủ đồ, bàn bóng bàn =====
+  // ===== KHU 1: SÂN CỜ — cột cờ, 4 cây phượng, cột bóng rổ, bụi cây, bàn bóng bàn =====
   case 0:{
     [-1,1].forEach(sx=>[-1,1].forEach(sz2=>pillar(sx*(hw-4),sz2*RD*0.2)));
     flagpole(0,-RD*0.04); sofa(-3.6,-RD*0.04,1,0); sofa(3.6,-RD*0.04,-1,0);          // cột cờ giữa sân, hai ghế đá hai bên
@@ -1196,7 +1194,7 @@ function buildRoom(keep){
     sconceMesh(wx(-1,.1),3.5,ryOf(-1)); sconceMesh(wx(1,.1),-1.5,ryOf(1));
     break;}
 
-  // ===== KHU 3: SÂN BÓNG — vạch sân, hai khung thành, ghế dự bị, cột đèn sát hàng rào, tủ đồ, bàn bóng bàn =====
+  // ===== KHU 3: SÂN BÓNG — vạch sân, hai khung thành, ghế dự bị, cột đèn sát hàng rào, bụi cây, bàn bóng bàn =====
   case 2:{
     sconceL[1].color.set(0xdfe9ff);
     sconceL[0].position.set(-hw+1.5,2.2,-4); sconceL[1].position.set(hw-1.5,2.2,6);
@@ -1215,7 +1213,7 @@ function buildRoom(keep){
     sofa(3.6,-8.7,0,1);  clue(1,3.6,.56,-8.7,.5,.08,.35,0);
     barrel(-6.2,-8.7);
     dresser(wx(-1,.8),5,1,0); clue(2,wx(-1,.8),1.28,5,.5,.05,.4,0);                      // bồn hoa cạnh sân
-    wardrobe(wx(1,.55),-1.5,-1,0); wardrobe(wx(1,.55),5.5,-1,0); wardrobe(wx(-1,.55),-5,1,0);   // tủ đồ ven hàng rào (chỗ trốn)
+    wardrobe(wx(1,.55),-1.5,-1,0); wardrobe(wx(1,.55),5.5,-1,0); wardrobe(wx(-1,.55),-5,1,0);   // bụi cây ven hàng rào (chỗ trốn)
     bed(wx(-1,1.4),8,-1,0,-1,0x2a4a5a);                                                  // bàn bóng bàn (chui xuống gầm)
     wardrobe(5,hd-.55,0,-1);
     pillar(9.3,-8.6); pillar(9.3,9);
@@ -1262,6 +1260,15 @@ function buildRoom(keep){
     sconceMesh(wx(-1,.1),-6,ryOf(-1)); sconceMesh(wx(1,.1),-6.5,ryOf(1));
     break;}
   }
+  {const RT=mulberry(gameSeed+door*131+5);                       // cây rải thêm ngoài sân, tránh đồ đã có và lối ra/vào
+    const free=(x,z)=>!obstacles.some(b=>x>b.x1-2.2&&x<b.x2+2.2&&z>b.z1-2.2&&z<b.z2+2.2);
+    const nT=Math.floor(RW*RD/110);
+    for(let k=0,t=0;k<nT*6&&t<nT;k++){
+      const x=(RT()-.5)*(RW-5), z=(RT()-.5)*(RD-10);
+      if(Math.abs(x)<3.2&&Math.abs(z)>hd-9) continue;           // chừa lối ra/vào cổng
+      if(lay===2&&Math.abs(x)<11&&Math.abs(z)<9) continue;      // chừa sân bóng
+      if(!free(x,z)) continue;
+      pillar(x,z); t++; } }
   sconceMesh(-1.9,-hd+.1,0); sconceMesh(1.9,-hd+.1,0);
 
   // vết máu, dấu tay, chữ viết bằng máu, giấy rơi
@@ -1817,7 +1824,7 @@ function act(){
 function startGhost(){
   gh.phase='warn'; gh.t=5.2; gh.alpha=0;
   if(modalOpen) closeModal(true), syncLock();
-  banner('ĐÈN CHỚP… VERITY ĐANG TỚI!\nTRỐN NGAY: tủ đồ hoặc gầm bàn bóng bàn (E)',4600);
+  banner('ĐÈN CHỚP… VERITY ĐANG TỚI!\nTRỐN NGAY: bụi cây hoặc gầm bàn bóng bàn (E)',4600);
   tone(90,1.6,'sawtooth',.12,45);
 }
 function ghostSpawn(){
@@ -1868,7 +1875,7 @@ function updGhost(dt){
     if(e>1.2&&!gh.shr){gh.shr=true; tone(900,.9,'sawtooth',.14,260); tone(120,1,'square',.14,50); noise(.9,.3);}
     if(gh.t<=0){gh.phase='hunt'; gh.t=0; gh.step=0;
       noise(1.2,.35); tone(60,1.4,'sawtooth',.22,200); whisper('chạy đi...');
-      banner('VERITY ĐANG ĐUỔI THEO BẠN!\nTRỐN NGAY (tủ đồ / gầm bàn bóng bàn — E)',3200);}
+      banner('VERITY ĐANG ĐUỔI THEO BẠN!\nTRỐN NGAY (bụi cây / gầm bàn bóng bàn — E)',3200);}
     return;
   }
   if(P==='hunt'||P==='search') gh.alpha=Math.min(1,gh.alpha+dt*1.4);
@@ -2335,7 +2342,7 @@ function update(dt){
       const dx=o.x-px,dzz=o.z-pz,d=Math.hypot(dx,dzz);
       if(d<o.r&&(dx*fxv+dzz*fzv)/(d||1)>0.35&&d<best){best=d;cur=o;}
     }
-    if(cur) txt=cur.kind==='hide'?(cur.type==='bed'?'[E] Chui xuống gầm bàn bóng bàn':'[E] Trốn vào tủ đồ'):cur.kind==='door'?(totalPieces()>=PIECES?'[E] Mở cổng thoát':'[E] Cổng thoát (cần đủ mảnh ghép)'):'[E] Lấy mảnh ghép (trả lời câu hỏi)';
+    if(cur) txt=cur.kind==='hide'?(cur.type==='bed'?'[E] Chui xuống gầm bàn bóng bàn':'[E] Trốn vào bụi cây'):cur.kind==='door'?(totalPieces()>=PIECES?'[E] Mở cổng thoát':'[E] Cổng thoát (cần đủ mảnh ghép)'):'[E] Lấy mảnh ghép (trả lời câu hỏi)';
   }
   const p=$('prompt'); p.style.display=txt?'block':'none'; p.textContent=txt;
 
@@ -2372,8 +2379,8 @@ function update(dt){
   if(boltT>0&&(1-boltT)<.22) lampF=Math.min(lampF,RF?.45:.04);
   let bf=1;
   if(blackT>0){ const el=blackD-blackT; bf=(!RF&&(el<.6||blackT<.8))?(Math.random()<.35?1:0):0; lampF*=bf; }
-  ambL.intensity=blackT>0?(.02+flashV*1.2):(.85*(1-dark*.7)+flashV*1.2);
-  lamp.intensity=1.4*lampF; lampB.intensity=1.2*lampF;
+  ambL.intensity=blackT>0?(.02+flashV*1.2):(.8*(1-dark*.7)+flashV*1.2);
+  lamp.intensity=1.3*lampF; lampB.intensity=1.1*lampF;
   if(flameMat){const v=Math.max(blackT>0?.04:.15,lampF);flameMat.color.setRGB(v*.94,v*.98,v);}
   if(!hidden) spot.intensity=flashOn&&!intro.on?(blackT>0?3.8:1.5)*(0.96+0.04*Math.sin(tt*23))*(ghostOn&&blackT<=0?.5:1):0;
   flashAmt+=((flashOn&&!hidden&&!intro.on)?1-flashAmt:-flashAmt)*Math.min(1,dt*10);
