@@ -83,6 +83,22 @@ SIREN_FILE = "siren-head-sounds-new.mp3"   # tiếng còi kinh dị: thỉnh tho
 STEP_CLIPS = [[0.357, 0.126], [1.009, 0.144], [1.609, 0.085], [2.236, 0.152], [2.852, 0.159], [3.477, 0.216], [4.102, 0.09], [4.775, 0.137], [5.373, 0.078], [6.027, 0.132], [6.624, 0.088], [7.266, 0.21], [7.871, 0.219], [8.504, 0.177], [9.101, 0.236], [9.732, 0.196], [10.365, 0.212], [11.021, 0.115], [11.64, 0.086], [12.267, 0.153], [12.883, 0.157], [13.508, 0.215], [14.133, 0.089], [14.806, 0.137], [15.404, 0.078], [16.058, 0.132], [16.655, 0.142], [17.322, 0.126], [17.959, 0.136], [18.628, 0.115], [19.278, 0.116], [19.922, 0.21], [20.53, 0.253], [21.179, 0.152], [21.823, 0.087], [22.482, 0.154], [23.096, 0.083], [23.784, 0.121], [25.072, 0.092], [25.708, 0.107], [26.407, 0.112]]
 THUNDER_FILE = "thunder_fx.mp3"
 RAIN_FILE = "rain_loop.wav"
+
+# ---- ĐỔI ÂM THANH: đặt 1 file nhạc/âm thanh mới (cùng thư mục với app.py) rồi sửa tên ở đây. ----
+# Nếu file tồn tại, nó thay cho: nhạc menu, nhạc nền khi chơi, tiếng ma, tiếng bị bắt và tiếng còi.
+# Không tìm thấy file thì game giữ nguyên các file cũ.
+SOUND_FILE = "sound.mp3"
+
+
+def _snd(default: str) -> str:
+    return SOUND_FILE if (Path(__file__).resolve().parent / SOUND_FILE).exists() else default
+
+
+MUSIC_FILE = _snd(MUSIC_FILE)
+PLAY_MUSIC_FILE = _snd(PLAY_MUSIC_FILE)
+CATCH_FILE = _snd(CATCH_FILE)
+GHOST_FILE = _snd(GHOST_FILE)
+SIREN_FILE = _snd(SIREN_FILE)
 # Bảng cắt của THUNDER_FILE: s = giây bắt đầu clip trong file, d = độ dài, c = thời điểm TIẾNG NỔ trong clip
 # (game căn c đúng vào lúc tia chớp + độ trễ), k = 'crack' (nổ gắt, dùng cho sét gần) / 'roll' (sấm cuộn, sét xa).
 THUNDER_CLIPS = [
@@ -722,26 +738,36 @@ const webTex=()=>T('web',128,128,(g,w,h)=>{
   g.clearRect(0,0,w,h);g.strokeStyle='rgba(220,220,220,.55)';g.lineWidth=1;
   for(let i=0;i<=6;i++){const a=i/6*Math.PI/2;g.beginPath();g.moveTo(0,0);g.lineTo(Math.cos(a)*128,Math.sin(a)*128);g.stroke();}
   for(let r=18;r<130;r+=18){g.beginPath();for(let i=0;i<=6;i++){const a=i/6*Math.PI/2,rr=r*(0.9+Math.random()*.2),x=Math.cos(a)*rr,y=Math.sin(a)*rr;if(i)g.lineTo(x,y);else g.moveTo(x,y);}g.stroke();}});
-const faceTex=()=>T('face',512,640,(g,w,h)=>{
-  const gr=g.createRadialGradient(w/2,h*.45,30,w/2,h*.5,w*.75);gr.addColorStop(0,'#dcd6c6');gr.addColorStop(1,'#625b50');
-  g.fillStyle=gr;g.fillRect(0,0,w,h);
-  g.strokeStyle='rgba(40,40,40,.55)';g.lineWidth=1.4;
-  for(let i=0;i<46;i++){let x=rnd(0,w),y=rnd(0,h);g.beginPath();g.moveTo(x,y);for(let k=0;k<5;k++){x+=rnd(-26,26);y+=rnd(6,28);g.lineTo(x,y);}g.stroke();}
-  [-1,1].forEach(s=>{g.save();g.translate(w/2+s*102,h*.36);g.rotate(s*.28);
-    const eg=g.createRadialGradient(0,0,4,0,0,76);eg.addColorStop(0,'#000');eg.addColorStop(.7,'#050505');eg.addColorStop(1,'rgba(20,20,20,0)');
-    g.fillStyle=eg;g.beginPath();g.ellipse(0,0,64,98,0,0,7);g.fill();
-    g.fillStyle='#e8e8f0';g.beginPath();g.arc(0,8,5,0,7);g.fill();g.restore();
-    g.strokeStyle='rgba(20,20,20,.7)';g.lineWidth=5;g.beginPath();g.moveTo(w/2+s*92,h*.36+90);g.lineTo(w/2+s*88,h*.36+200);g.stroke();});
-  g.fillStyle='#101010';[-1,1].forEach(s=>{g.beginPath();g.ellipse(w/2+s*14,h*.55,6,15,s*.3,0,7);g.fill();});
-  g.save();g.translate(w/2,h*.77);
-  g.fillStyle='#000';g.beginPath();g.ellipse(0,0,150,128,0,0,7);g.fill();
-  const ey=x=>Math.sqrt(Math.max(0,1-(x/150)*(x/150)))*128;
-  g.fillStyle='#e8e2d0';
-  for(let i=-6;i<=6;i++){const x=i*21,hh=26+Math.abs(Math.sin(i*2.1))*22;
-    g.beginPath();g.moveTo(x-9,-ey(x-9)+3);g.lineTo(x,-ey(x)+hh);g.lineTo(x+9,-ey(x+9)+3);g.fill();
-    g.beginPath();g.moveTo(x-9,ey(x-9)-3);g.lineTo(x,ey(x)-hh*.8);g.lineTo(x+9,ey(x+9)-3);g.fill();}
+// Mặt cười vàng: mắt đen xếch, miệng toác rộng có hai hàng răng trắng + lưỡi. s = tỉ lệ (1 ≈ rộng 240px)
+function drawSmiley(g,cx,cy,s){
+  [-1,1].forEach(sg=>{ g.save(); g.translate(cx+sg*58*s,cy-42*s); g.rotate(sg*.2);
+    g.fillStyle='#0b0805'; g.beginPath(); g.ellipse(0,0,17*s,33*s,0,0,7); g.fill();
+    g.fillStyle='#fff'; g.beginPath(); g.arc(-3*s,-12*s,5*s,0,7); g.fill(); g.restore(); });
+  const x0=cx-122*s, x1=cx+122*s, y0=cy+22*s;
+  const mouth=()=>{ g.beginPath(); g.moveTo(x0,y0); g.quadraticCurveTo(cx,cy+185*s,x1,y0); g.quadraticCurveTo(cx,cy+62*s,x0,y0); g.closePath(); };
+  mouth(); g.fillStyle='#1a0204'; g.fill();
+  g.save(); mouth(); g.clip();
+  g.fillStyle='#e03a52'; g.beginPath(); g.ellipse(cx,cy+98*s,56*s,24*s,0,0,7); g.fill();              // lưỡi
+  g.fillStyle='#f6f2e4';
+  for(let i=-6;i<=6;i++){ const x=cx+i*19.5*s, u=1-Math.pow((i*19.5)/122,2);
+    g.fillRect(x-9*s,cy+14*s,18*s,22*s+(40*u)*s);                                                    // răng trên
+    g.fillRect(x-9*s,cy+25*s+(75*u)*s-24*s+ (i%2?0:4*s),18*s,40*s); }                                // răng dưới
   g.restore();
-  stains(g,w,h,10,.25);noiseFx(g,w,h,16);});
+  mouth(); g.strokeStyle='#2a0508'; g.lineWidth=5*s; g.lineJoin='round'; g.stroke();
+}
+const faceTex=()=>T('face',512,640,(g,w,h)=>{          // cận mặt cho cảnh jumpscare (nền trong suốt, quả cầu tròn)
+  g.clearRect(0,0,w,h);
+  const gr=g.createRadialGradient(w/2-50,h/2-70,20,w/2,h/2,255);gr.addColorStop(0,'#ffe44d');gr.addColorStop(.7,'#ffc800');gr.addColorStop(1,'#c98a00');
+  g.fillStyle=gr; g.beginPath(); g.arc(w/2,h/2,252,0,7); g.fill();
+  drawSmiley(g,w/2,h/2-6,1.7);
+});
+const smileyMapTex=()=>T('smap',1024,512,(g,w,h)=>{     // bản đồ phủ quả cầu: mặt ở chính giữa phía trước (x = 256)
+  const gr=g.createLinearGradient(0,0,0,h);gr.addColorStop(0,'#ffd91f');gr.addColorStop(.5,'#ffc800');gr.addColorStop(1,'#d99a00');
+  g.fillStyle=gr; g.fillRect(0,0,w,h);
+  g.fillStyle='rgba(255,150,60,.18)'; [[190,330],[322,330]].forEach(p=>{g.beginPath();g.ellipse(p[0],p[1],34,22,0,0,7);g.fill();});   // má ửng
+  drawSmiley(g,256,262,1.05);
+  noiseFx(g,w,h,10);});
+
 
 // ---------- Cơn bão bên ngoài cửa sổ (mưa, sét, sấm) ----------
 const haloTex=()=>T('halo',64,64,(g,w,h)=>{
@@ -845,37 +871,13 @@ const ghostRoot=new THREE.Group(); ghostRoot.rotation.order='YXZ'; ghostRoot.pos
 const gBody=new THREE.Group(); ghostRoot.add(gBody);
 const gArms=[], gHair=[], gMats=[]; let gHeadG, gMouth, gLight;
 (function(){
-  const skin=new THREE.MeshStandardMaterial({color:0xb4aea0,roughness:.7,emissive:0x2c2822});
-  const dk=new THREE.MeshStandardMaterial({color:0x060505,roughness:1,side:THREE.DoubleSide,emissive:0x060606});
-  const prof=[[0,.74],[.2,.68],[.7,.5],[1.2,.33],[1.5,.27],[1.78,.4],[2.0,.44],[2.12,.22],[2.24,.1]];
-  const lg=new THREE.LatheGeometry(prof.map(p=>new THREE.Vector2(p[1],p[0])),28), pa=lg.attributes.position;
-  for(let i=0;i<pa.count;i++){const y=pa.getY(i);if(y<.32){const a=Math.atan2(pa.getZ(i),pa.getX(i));
-    pa.setY(i,y+Math.abs(Math.sin(a*5)+Math.sin(a*11+1.3))*.3*(1-y/.32));}}
-  lg.computeVertexNormals(); gBody.add(new THREE.Mesh(lg,dk));
-  gHeadG=new THREE.Group(); gHeadG.position.set(0,2.4,0.05); gBody.add(gHeadG);
-  const hs=new THREE.Mesh(new THREE.SphereGeometry(1,28,24),skin); hs.scale.set(.27,.44,.25); gHeadG.add(hs);
-  const ft=faceTex();
-  const fm=new THREE.MeshStandardMaterial({map:ft,emissiveMap:ft,emissive:0xffffff,emissiveIntensity:.6,roughness:.8});
-  const fs=new THREE.Mesh(new THREE.SphereGeometry(1.012,28,24,Math.PI/2-.95,1.9,Math.PI*.12,Math.PI*.72),fm); fs.scale.set(.27,.44,.25); gHeadG.add(fs);
-  const gm=new THREE.MeshBasicMaterial({color:0xe8e8ff});
-  [-1,1].forEach(s=>{const e=new THREE.Mesh(new THREE.SphereGeometry(.024,8,6),gm);e.position.set(s*.1,.15,.232);gHeadG.add(e);});
-  gMouth=new THREE.Mesh(new THREE.CircleGeometry(.1,20),new THREE.MeshBasicMaterial({color:0x000000}));
-  gMouth.position.set(0,-.2,.23); gMouth.scale.set(1.1,.4,1); gHeadG.add(gMouth);
-  for(let i=0;i<20;i++){const a=.9+i/19*(Math.PI*2-1.8),len=1.2+Math.random()*.9;
-    const g2=new THREE.Group(); g2.position.set(Math.sin(a)*.2,.2,Math.cos(a)*.18-.02);
-    const m2=new THREE.Mesh(new THREE.BoxGeometry(.014,len,.014),dk); m2.position.y=-len/2; g2.add(m2);
-    g2.rotation.z=Math.sin(a)*.12; gHeadG.add(g2); gHair.push(g2);}
-  [-1,1].forEach(s=>{const sh=new THREE.Group(); sh.position.set(s*.42,2.02,.03); gBody.add(sh);
-    const up=new THREE.Mesh(new THREE.CylinderGeometry(.045,.035,.95,6),skin); up.position.y=-.475; sh.add(up);
-    const el=new THREE.Group(); el.position.y=-.95; sh.add(el);
-    const fo=new THREE.Mesh(new THREE.CylinderGeometry(.035,.028,.95,6),skin); fo.position.y=-.475; el.add(fo);
-    const hand=new THREE.Group(); hand.position.y=-.95; el.add(hand);
-    for(let k=0;k<5;k++){const f=new THREE.Group(); f.rotation.z=(k-2)*.26; hand.add(f);
-      const fm2=new THREE.Mesh(new THREE.CylinderGeometry(.012,.004,.36,5),skin); fm2.position.y=-.18; f.add(fm2);}
-    if(s>0){const ru=new THREE.Mesh(new THREE.BoxGeometry(.035,.75,.012),new THREE.MeshStandardMaterial({color:0xc8a45a,roughness:.6}));ru.position.y=-.38;hand.add(ru);}   // thước kẻ gỗ
-    gArms.push({sh,el,s});});
-  [-1,1].forEach(s=>{const gl=new THREE.Mesh(new THREE.TorusGeometry(.075,.009,6,16),dk);gl.position.set(s*.1,.15,.245);gHeadG.add(gl);});   // gọng kính
-  gLight=new THREE.PointLight(0xcfd8ff,0,11); gLight.position.set(0,2.2,.9); gBody.add(gLight);
+  // Ma = quả cầu mặt cười màu vàng, miệng toác đầy răng, lơ lửng giữa không trung
+  gHeadG=new THREE.Group(); gHeadG.position.set(0,1.4,0); gBody.add(gHeadG);
+  const mt=smileyMapTex();
+  const ballM=new THREE.MeshStandardMaterial({map:mt,emissiveMap:mt,emissive:0xffffff,emissiveIntensity:.8,roughness:.5});
+  const ball=new THREE.Mesh(new THREE.SphereGeometry(.72,40,32),ballM); ball.castShadow=false; gHeadG.add(ball);
+  gMouth=new THREE.Object3D(); gHeadG.add(gMouth);       // chỉ dùng scale.y làm nhịp "cười" cho animGhost
+  gLight=new THREE.PointLight(0xffe27a,0,11); gLight.position.set(0,1.5,1.3); gBody.add(gLight);
   const seen=new Set();
   ghostRoot.traverse(o=>{if(o.material&&!seen.has(o.material)){seen.add(o.material);o.material.transparent=true;o.material.opacity=0;gMats.push(o.material);}});
   ghostRoot.scale.set(1.05,1.05,1.05);
@@ -1883,7 +1885,7 @@ function animGhost(dt){
   gLight.intensity=gh.alpha*2.4*(0.6+0.4*Math.random());
   if(gh.phase!=='scare'){
     const sp=curSpot;
-    const sink=(gh.phase==='search'||gh.phase==='leave')&&sp?sp.sink*gh.peek:0;
+    const sink=(gh.phase==='search'||gh.phase==='leave')&&sp?sp.sink*.6*gh.peek:0;
     const bend=(gh.phase==='search'||gh.phase==='leave')&&sp?sp.bend*gh.peek:(gh.phase==='reveal'?.65*Math.max(0,gh.t/gh.t0):0);
     ghostRoot.position.set(gh.x,-sink+Math.sin(t*2)*.04,gh.z);
     let da=gh.face-ghostRoot.rotation.y; da=Math.atan2(Math.sin(da),Math.cos(da));
@@ -1897,6 +1899,7 @@ function animGhost(dt){
   if(gh.phase==='scare'||lunge){gHeadG.rotation.z+=(Math.random()-.5)*.5;gHeadG.rotation.y+=(Math.random()-.5)*.4;}
   gHair.forEach((h,i)=>{h.rotation.x=Math.sin(t*2+i)*.12;});
   gMouth.scale.y=(gh.phase==='scare'||lunge)?1.1+Math.abs(Math.sin(t*40))*.5:.35+Math.sin(t*3)*.1+(gh.phase==='search'?gh.peek*.5:0);
+  {const sq=.9+gMouth.scale.y*.15, sx=Math.min(1.06,2-sq); gHeadG.scale.set(sx,sq,sx);}   // mặt cười phồng/xẹp theo nhịp "cười"
 }
 const sc=$('scare'), scx=sc.getContext('2d');
 function drawScare(t){
