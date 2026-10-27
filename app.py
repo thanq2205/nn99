@@ -20,40 +20,41 @@ st.set_page_config(page_title="VERITY", layout="wide")
 #   q: câu hỏi | a: đáp án ĐÚNG | w: 3 đáp án SAI | digit: chữ số | hint: gợi ý
 # Vị trí A/B/C/D được xáo ngẫu nhiên mỗi lần mở câu hỏi.
 # ---------------------------------------------------------------------------
-# Ngân hàng câu hỏi môn học (15 câu = 5 khu x 3 câu). Mỗi ván game xáo trộn vị trí đáp án A/B/C/D và chữ số chìa khóa.
+# Ngân hàng câu hỏi NHÌN HÌNH ĐOÁN (15 câu = 5 khu x 3 câu). e = emoji làm hình; muốn dùng ảnh của bạn thì thêm "img": "ten_file.png" (đặt cùng thư mục app.py).
+# (cũ: Ngân hàng câu hỏi môn học Mỗi ván game xáo trộn vị trí đáp án A/B/C/D và chữ số chìa khóa.
 #   q: câu hỏi | a: đáp án ĐÚNG | w: 3 đáp án SAI | hint: gợi ý
 # Muốn thêm câu hỏi: thêm dict cùng dạng vào SCHOOL_QS (nên giữ tổng số = 15, hoặc sửa FIXED/BONUS bên dưới).
 SCHOOL_QS = [
-    {"q": "Toán: Diện tích hình chữ nhật dài 8 cm, rộng 5 cm là bao nhiêu?",
-     "a": "40 cm²", "w": ["13 cm²", "26 cm²", "80 cm²"], "digit": 4, "hint": "Diện tích = dài × rộng."},
-    {"q": "Toán: Căn bậc hai của 144 là bao nhiêu?",
-     "a": "12", "w": ["14", "16", "72"], "digit": 7, "hint": "12 × 12 = ?"},
-    {"q": "Toán: Tổng ba góc trong một tam giác bằng bao nhiêu độ?",
-     "a": "180°", "w": ["90°", "270°", "360°"], "digit": 1, "hint": "Bằng hai góc vuông ghép lại."},
-    {"q": "Ngữ văn: Truyện Kiều của Nguyễn Du được viết theo thể thơ nào?",
-     "a": "Lục bát", "w": ["Song thất lục bát", "Thất ngôn bát cú", "Thơ tự do"], "digit": 3, "hint": "Câu 6 chữ xen kẽ câu 8 chữ."},
-    {"q": "Ngữ văn: Tác giả của truyện ngắn \"Lão Hạc\" là ai?",
-     "a": "Nam Cao", "w": ["Ngô Tất Tố", "Tô Hoài", "Nguyên Hồng"], "digit": 8, "hint": "Ông còn viết \"Chí Phèo\"."},
-    {"q": "Lịch sử: Chiến thắng Bạch Đằng năm 938 do ai lãnh đạo?",
-     "a": "Ngô Quyền", "w": ["Lê Lợi", "Trần Hưng Đạo", "Đinh Bộ Lĩnh"], "digit": 5, "hint": "Ông xưng vương sau chiến thắng này."},
-    {"q": "Lịch sử: Nước Việt Nam Dân chủ Cộng hòa ra đời vào năm nào?",
-     "a": "1945", "w": ["1930", "1954", "1975"], "digit": 9, "hint": "Tuyên ngôn Độc lập đọc ngày 2/9."},
-    {"q": "Địa lý: Thủ đô của Nhật Bản là thành phố nào?",
-     "a": "Tokyo", "w": ["Osaka", "Kyoto", "Seoul"], "digit": 6, "hint": "Tên bắt đầu bằng chữ T."},
-    {"q": "Địa lý: Đại dương lớn nhất thế giới là đại dương nào?",
-     "a": "Thái Bình Dương", "w": ["Đại Tây Dương", "Ấn Độ Dương", "Bắc Băng Dương"], "digit": 0, "hint": "Tên nghe rất \"bình yên\"."},
-    {"q": "Vật lý: Đơn vị đo lực trong hệ SI là gì?",
-     "a": "Niutơn (N)", "w": ["Jun (J)", "Oát (W)", "Pascal (Pa)"], "digit": 2, "hint": "Đặt theo tên nhà bác học có quả táo rơi."},
-    {"q": "Hóa học: Khí nào chiếm tỉ lệ lớn nhất trong không khí?",
-     "a": "Nitơ", "w": ["Oxi", "Cacbonic", "Hiđro"], "digit": 7, "hint": "Chiếm khoảng 78%."},
-    {"q": "Sinh học: Bào quan nào được gọi là \"nhà máy năng lượng\" của tế bào?",
-     "a": "Ti thể", "w": ["Nhân tế bào", "Lục lạp", "Riboxom"], "digit": 3, "hint": "Nơi diễn ra hô hấp tế bào."},
-    {"q": "Tiếng Anh: Dạng quá khứ đơn của động từ \"go\" là gì?",
-     "a": "went", "w": ["goed", "gone", "goes"], "digit": 1, "hint": "Động từ bất quy tắc."},
-    {"q": "Tin học: Số nhị phân 1011 bằng số thập phân nào?",
-     "a": "11", "w": ["9", "10", "13"], "digit": 9, "hint": "8 + 0 + 2 + 1"},
-    {"q": "Tiếng Anh: Từ \"verity\" có nghĩa là gì?",
-     "a": "Sự thật", "w": ["Lời nói dối", "Sự tha thứ", "Bài kiểm tra"], "digit": 4, "hint": "Cũng là tên của kẻ đang đuổi theo bạn."},
+    {"e": "🐘", "q": "Đây là con vật nào?",
+     "a": "Con voi", "w": ["Con tê giác", "Con hà mã", "Con lạc đà"], "digit": 4, "hint": "Có chiếc vòi dài và đôi ngà."},
+    {"e": "🌋", "q": "Hình này thể hiện hiện tượng thiên nhiên nào?",
+     "a": "Núi lửa phun trào", "w": ["Sóng thần", "Lốc xoáy", "Động đất"], "digit": 7, "hint": "Có dung nham nóng chảy trào ra."},
+    {"e": "🦋", "q": "Đây là loài côn trùng nào?",
+     "a": "Con bướm", "w": ["Con ong", "Con chuồn chuồn", "Con dơi"], "digit": 1, "hint": "Đôi cánh nhiều màu sắc, bay từ hoa này sang hoa khác."},
+    {"e": "🍎", "q": "Đây là loại quả nào?",
+     "a": "Quả táo", "w": ["Quả lê", "Quả đào", "Quả cà chua"], "digit": 3, "hint": "Câu chuyện quả táo rơi của Newton."},
+    {"e": "⚽", "q": "Đây là quả bóng của môn thể thao nào?",
+     "a": "Bóng đá", "w": ["Bóng rổ", "Bóng chuyền", "Bóng bầu dục"], "digit": 8, "hint": "Môn thể thao vua."},
+    {"e": "🚲", "q": "Đây là phương tiện nào?",
+     "a": "Xe đạp", "w": ["Xe máy", "Xe lăn", "Xe ba gác"], "digit": 5, "hint": "Chạy bằng sức đạp của chân."},
+    {"e": "🌈", "q": "Đây là hiện tượng gì sau cơn mưa?",
+     "a": "Cầu vồng", "w": ["Mưa đá", "Sấm sét", "Sương mù"], "digit": 9, "hint": "Có 7 sắc màu."},
+    {"e": "🔭", "q": "Đây là dụng cụ gì?",
+     "a": "Kính thiên văn", "w": ["Kính hiển vi", "Ống nhòm", "Máy ảnh"], "digit": 6, "hint": "Dùng để quan sát các vì sao."},
+    {"e": "🐢", "q": "Đây là con vật nào?",
+     "a": "Con rùa", "w": ["Con ốc sên", "Con cua", "Con thằn lằn"], "digit": 0, "hint": "Mang trên lưng một chiếc mai cứng."},
+    {"e": "🌙", "q": "Đây là thiên thể nào?",
+     "a": "Mặt trăng", "w": ["Mặt trời", "Ngôi sao", "Sao Hỏa"], "digit": 2, "hint": "Xuất hiện trên bầu trời đêm."},
+    {"e": "🎹", "q": "Đây là nhạc cụ nào?",
+     "a": "Đàn piano", "w": ["Đàn ghi-ta", "Đàn violin", "Trống"], "digit": 3, "hint": "Có các phím đen và phím trắng."},
+    {"e": "🧲", "q": "Đây là vật gì?",
+     "a": "Nam châm", "w": ["Chìa khóa", "Móng ngựa", "Cái kẹp giấy"], "digit": 7, "hint": "Hút được sắt."},
+    {"e": "🍉", "q": "Đây là loại quả nào?",
+     "a": "Dưa hấu", "w": ["Quả bí", "Quả dừa", "Quả bưởi"], "digit": 1, "hint": "Vỏ xanh, ruột đỏ, ngọt mát ngày hè."},
+    {"e": "⏰", "q": "Đây là vật dụng gì?",
+     "a": "Đồng hồ báo thức", "w": ["Cái chuông", "La bàn", "Cái cân"], "digit": 9, "hint": "Kêu vào buổi sáng để đánh thức bạn."},
+    {"e": "🐧", "q": "Đây là con vật nào?",
+     "a": "Chim cánh cụt", "w": ["Con vịt", "Con hải cẩu", "Con mòng biển"], "digit": 4, "hint": "Sống ở vùng cực lạnh giá, không biết bay."},
 ]
 
 _ROOMS = [   # thứ tự = kiểu khu 3D: 0 sân cờ, 1 dãy lớp học, 2 sân bóng, 3 vườn cây phượng, 4 cổng trường
@@ -161,16 +162,32 @@ FIXED_QUESTIONS = SCHOOL_QS[:5]           # mỗi phòng luôn có 1 câu trong 
 BONUS_QUESTIONS = SCHOOL_QS[5:]           # mỗi phòng nhận thêm 2 câu trong 10 câu này
 
 
+def _pic(q) -> str:
+    """Hình của câu hỏi: file ảnh (nếu có 'img' và file tồn tại) hoặc emoji 'e'."""
+    f = q.get("img")
+    if f:
+        ext = Path(f).suffix.lower().lstrip(".")
+        mime = {"jpg": "image/jpeg", "jpeg": "image/jpeg", "png": "image/png", "webp": "image/webp", "gif": "image/gif"}.get(ext, "image/png")
+        d = load_asset(f, mime)
+        if d:
+            return d
+    return q.get("e", "")
+
+
+def _qd(q) -> dict:
+    return {"q": q["q"], "o": [q["a"]] + q["w"], "hint": q["hint"], "p": _pic(q)}
+
+
 def build_fixed() -> str:
-    return json.dumps([{"q": q["q"], "o": [q["a"]] + q["w"], "hint": q["hint"]} for q in FIXED_QUESTIONS], ensure_ascii=False)
+    return json.dumps([_qd(q) for q in FIXED_QUESTIONS], ensure_ascii=False)
 
 
 def build_bonus() -> str:
-    return json.dumps([{"q": q["q"], "o": [q["a"]] + q["w"], "hint": q["hint"]} for q in BONUS_QUESTIONS], ensure_ascii=False)
+    return json.dumps([_qd(q) for q in BONUS_QUESTIONS], ensure_ascii=False)
 
 
 def build_pool() -> str:
-    return json.dumps([{"q": q["q"], "o": [q["a"]] + q["w"], "hint": q["hint"]} for q in EXTRA_QUESTIONS], ensure_ascii=False)
+    return json.dumps([_qd(q) for q in EXTRA_QUESTIONS], ensure_ascii=False)
 
 
 def build_data() -> str:
@@ -180,7 +197,7 @@ def build_data() -> str:
             "name": d["name"], "intro": d["intro"], "order": d["order"], "order_text": d["order_text"],
             # o[0] luôn là đáp án đúng; phía JS sẽ xáo thứ tự A/B/C/D
             "questions": [
-                {"q": q["q"], "o": [q["a"]] + q["w"], "digit": q["digit"], "hint": q["hint"]}
+                {**_qd(q), "digit": q["digit"]}
                 for q in d["questions"]
             ],
         })
@@ -310,6 +327,14 @@ GAME_HTML = r"""
   #mq{font-size:27px;line-height:1.4;margin-bottom:18px;color:#16130f;font-weight:900;text-transform:uppercase;letter-spacing:.5px;
       text-shadow:none;-webkit-font-smoothing:antialiased}
   #vd{display:none;margin:-4px 0 10px;color:#8a0f0f;font-size:20px;font-weight:900;letter-spacing:1px;animation:mh .8s infinite}
+  #mpic{display:none;margin:0 auto 8px;height:112px;line-height:112px;font-size:92px;font-family:'Apple Color Emoji','Segoe UI Emoji','Noto Color Emoji',sans-serif;text-shadow:none}
+  #mpic img{max-height:112px;max-width:70%;border:3px solid #16130f;vertical-align:middle;transform:rotate(1deg)}
+  #box.pic{padding:22px 40px 18px}
+  #box.pic #mt{font-size:24px;margin-bottom:4px}
+  #box.pic #mq{font-size:23px;margin-bottom:6px}
+  #box.pic .opt{font-size:21px;padding:6px 16px;gap:14px}
+  #box.pic .opt b{min-width:34px;height:34px;line-height:30px;font-size:19px}
+  #box.pic #fb{min-height:22px;margin:4px 0;font-size:17px}
   #mi{width:80%;padding:9px;font-size:22px;border:0;border-bottom:3px solid #2b2722;border-radius:0;
       background:rgba(255,255,255,.14);color:#2b2722;text-align:center;outline:none;font-family:inherit;letter-spacing:4px}
   #fb{min-height:28px;margin:10px 0;color:#8a0f0f;font-size:21px;font-weight:900;text-transform:uppercase;letter-spacing:1px}
@@ -357,7 +382,7 @@ GAME_HTML = r"""
 <div id="fade"></div>
 
 <div id="modal"><div id="box">
-  <div id="mt"></div><div id="vd"></div><div id="mq"></div>
+  <div id="mt"></div><div id="vd"></div><div id="mq"></div><div id="mpic"></div>
   <div id="opts"></div>
   <input id="mi" autocomplete="off" spellcheck="false" inputmode="numeric">
   <div id="fb"></div>
@@ -392,7 +417,7 @@ GAME_HTML = r"""
 
 <div id="story" class="ov">
   <div class="sty">
-    <p>Bạn bị nhốt lại ở sân trường giữa đêm bão. Chạy khắp các khu của trường, tìm <b class="cl">15 MẢNH GHÉP PHÁT SÁNG</b>. Mỗi mảnh phải <b>trả lời đúng một câu hỏi</b> mới lấy được. Đủ mảnh thì <b>cổng thoát</b> sẽ mở.</p>
+    <p>Bạn bị nhốt lại ở sân trường giữa đêm bão. Chạy khắp các khu của trường, tìm <b class="cl">15 MẢNH GHÉP PHÁT SÁNG</b>. Mỗi mảnh phải <b>nhìn hình đoán đúng</b> mới lấy được. Đủ mảnh thì <b>cổng thoát</b> sẽ mở.</p>
     <p>Cô giáo ma <b>VERITY</b> luôn rình rập khi bạn trả lời câu hỏi. <b>Trả lời sai, cô ấy sẽ tới sớm hơn.</b> Trốn trong <b>bụi cây</b> hoặc <b>gầm bàn bóng bàn</b> (<kbd>E</kbd>).</p>
   </div>
   <div class="mb"><button id="sgo">BẮT ĐẦU</button></div>
@@ -416,7 +441,7 @@ GAME_HTML = r"""
     </ul>
     <h3>Mục tiêu</h3>
     <ul>
-      <li>Sân trường có <b>5 khu</b> thông nhau, cứ đi tự do qua lại giữa các khu. Mỗi khu giấu <b>3 mảnh ghép</b> phát sáng (tổng 15). Trả lời đúng <b>câu hỏi trắc nghiệm A/B/C/D</b> để nhặt mảnh ghép.</li>
+      <li>Sân trường có <b>5 khu</b> thông nhau, cứ đi tự do qua lại giữa các khu. Mỗi khu giấu <b>3 mảnh ghép</b> phát sáng (tổng 15). Nhìn <b>hình ảnh</b> rồi chọn đáp án <b>A/B/C/D</b> đúng để nhặt mảnh ghép.</li>
       <li>Không có qua màn: nhặt đủ 15 mảnh theo thứ tự tùy bạn, rồi chạy tới <b>cổng thoát</b> ở khu cuối cùng của trường.</li>
       <li>Chọn sai đáp án sẽ mất 1 (có 3 ).</li>
     </ul>
@@ -474,7 +499,7 @@ function rollGame(){
     const picks=[];                                                   // mỗi phòng 3 câu: 1 câu bắt buộc + 2 câu bổ sung (thiếu mới bốc ngẫu nhiên)
     if(fixed.length) picks.push(fixed.pop());
     while(picks.length<3) picks.push(bonus.length?bonus.pop():QPOOL[pool[p++%pool.length]]);
-    const questions=shuffle(picks).map(q=>({q:q.q,o:q.o,hint:q.hint,digit:Math.floor(Math.random()*10)}));   // xáo vị trí chìa 1/2/3
+    const questions=shuffle(picks).map(q=>({q:q.q,o:q.o,hint:q.hint,p:q.p,digit:Math.floor(Math.random()*10)}));   // xáo vị trí chìa 1/2/3
     const order=shuffle([0,1,2]);
     return {name:base.name,intro:base.intro,order,order_text:'Ghép chìa '+order.map(k=>k+1).join(' → chìa ')+'.',questions};
   });
@@ -1572,7 +1597,12 @@ function closeModal(silent){modalOpen=false;$('modal').style.display='none';$('m
   if(!silent) syncLock();}
 function openQ(i){
   const q=DOORS[door].questions[i]; modalMode='q'; modalIdx=i;
-  $('mt').textContent='Câu hỏi '+(i+1); $('mq').textContent=q.q; $('b2').style.display='inline-block';
+  $('mt').textContent='Câu hỏi '+(i+1); $('mq').textContent=q.q;
+  {const pc=$('mpic'); pc.innerHTML=''; pc.textContent='';
+   if(q.p){ pc.style.display='block'; $('box').classList.add('pic');
+     if(q.p.indexOf('data:')===0){const im=document.createElement('img'); im.src=q.p; pc.appendChild(im);} else pc.textContent=q.p; }
+   else { pc.style.display='none'; $('box').classList.remove('pic'); } }
+  $('b2').style.display='inline-block';
   $('mi').style.display='none'; $('b1').style.display='none';
   optOrder=shuffle([0,1,2,3]); wrongSet={};            // q.o[0] là đáp án đúng
   const box=$('opts'); box.innerHTML=''; box.style.display='flex';
@@ -1604,7 +1634,7 @@ function choose(k){
 }
 function openCode(){
   const D=DOORS[door]; modalMode='code';
-  $('mt').textContent='Ổ khóa'; $('mq').textContent='Nhập mật mã '+D.questions.length+' chữ số. '+D.order_text;
+  $('mpic').style.display='none'; $('box').classList.remove('pic'); $('mt').textContent='Ổ khóa'; $('mq').textContent='Nhập mật mã '+D.questions.length+' chữ số. '+D.order_text;
   $('b2').style.display='none'; $('opts').style.display='none'; $('mi').style.display=''; $('b1').style.display=''; openModal();
 }
 function submit(){
@@ -2345,7 +2375,7 @@ function update(dt){
       const dx=o.x-px,dzz=o.z-pz,d=Math.hypot(dx,dzz);
       if(d<o.r&&(dx*fxv+dzz*fzv)/(d||1)>0.35&&d<best){best=d;cur=o;}
     }
-    if(cur) txt=cur.kind==='hide'?(cur.type==='bed'?'[E] Chui xuống gầm bàn bóng bàn':'[E] Trốn vào bụi cây'):cur.kind==='door'?(totalPieces()>=PIECES?'[E] Mở cổng thoát':'[E] Cổng thoát (cần đủ mảnh ghép)'):'[E] Lấy mảnh ghép (trả lời câu hỏi)';
+    if(cur) txt=cur.kind==='hide'?(cur.type==='bed'?'[E] Chui xuống gầm bàn bóng bàn':'[E] Trốn vào bụi cây'):cur.kind==='door'?(totalPieces()>=PIECES?'[E] Mở cổng thoát':'[E] Cổng thoát (cần đủ mảnh ghép)'):'[E] Lấy mảnh ghép (nhìn hình đoán)';
   }
   const p=$('prompt'); p.style.display=txt?'block':'none'; p.textContent=txt;
 
