@@ -738,36 +738,49 @@ const webTex=()=>T('web',128,128,(g,w,h)=>{
   g.clearRect(0,0,w,h);g.strokeStyle='rgba(220,220,220,.55)';g.lineWidth=1;
   for(let i=0;i<=6;i++){const a=i/6*Math.PI/2;g.beginPath();g.moveTo(0,0);g.lineTo(Math.cos(a)*128,Math.sin(a)*128);g.stroke();}
   for(let r=18;r<130;r+=18){g.beginPath();for(let i=0;i<=6;i++){const a=i/6*Math.PI/2,rr=r*(0.9+Math.random()*.2),x=Math.cos(a)*rr,y=Math.sin(a)*rr;if(i)g.lineTo(x,y);else g.moveTo(x,y);}g.stroke();}});
-// Mặt cười vàng: mắt đen xếch, miệng toác rộng có hai hàng răng trắng + lưỡi. s = tỉ lệ (1 ≈ rộng 240px)
+// Mặt cười kinh dị: vàng úa bẩn, hốc mắt đen sâu, miệng toác quá rộng đầy răng lởm chởm. s = tỉ lệ (1 ≈ rộng 270px)
 function drawSmiley(g,cx,cy,s){
-  [-1,1].forEach(sg=>{ g.save(); g.translate(cx+sg*58*s,cy-42*s); g.rotate(sg*.2);
-    g.fillStyle='#0b0805'; g.beginPath(); g.ellipse(0,0,17*s,33*s,0,0,7); g.fill();
-    g.fillStyle='#fff'; g.beginPath(); g.arc(-3*s,-12*s,5*s,0,7); g.fill(); g.restore(); });
-  const x0=cx-122*s, x1=cx+122*s, y0=cy+22*s;
-  const mouth=()=>{ g.beginPath(); g.moveTo(x0,y0); g.quadraticCurveTo(cx,cy+185*s,x1,y0); g.quadraticCurveTo(cx,cy+62*s,x0,y0); g.closePath(); };
-  mouth(); g.fillStyle='#1a0204'; g.fill();
+  [-1,1].forEach((sg,k)=>{ g.save(); g.translate(cx+sg*58*s,cy-42*s); g.rotate(sg*.25);
+    const sh=g.createRadialGradient(0,0,6*s,0,0,62*s); sh.addColorStop(0,'rgba(12,8,0,.9)'); sh.addColorStop(1,'rgba(12,8,0,0)');
+    g.fillStyle=sh; g.beginPath(); g.ellipse(0,0,62*s,76*s,0,0,7); g.fill();            // quầng thâm quanh mắt
+    g.fillStyle='#030202'; g.beginPath(); g.ellipse(0,0,(k?21:16)*s,(k?42:34)*s,0,0,7); g.fill();
+    g.fillStyle='#cfc9b8'; g.beginPath(); g.arc(1*s,-3*s,2.6*s,0,7); g.fill(); g.restore(); });   // đồng tử bé xíu
+  const x0=cx-135*s, x1=cx+135*s, y0=cy+22*s;
+  const mouth=()=>{ g.beginPath(); g.moveTo(x0,y0); g.quadraticCurveTo(cx,cy+200*s,x1,y0); g.quadraticCurveTo(cx,cy+62*s,x0,y0); g.closePath(); };
+  mouth(); g.fillStyle='#090102'; g.fill();
   g.save(); mouth(); g.clip();
-  g.fillStyle='#e03a52'; g.beginPath(); g.ellipse(cx,cy+98*s,56*s,24*s,0,0,7); g.fill();              // lưỡi
-  g.fillStyle='#f6f2e4';
-  for(let i=-6;i<=6;i++){ const x=cx+i*19.5*s, u=1-Math.pow((i*19.5)/122,2);
-    g.fillRect(x-9*s,cy+14*s,18*s,22*s+(40*u)*s);                                                    // răng trên
-    g.fillRect(x-9*s,cy+25*s+(75*u)*s-24*s+ (i%2?0:4*s),18*s,40*s); }                                // răng dưới
+  const R2=mulberry(77);
+  for(let i=-8;i<=8;i++){ const dx=i*16*s, u=Math.max(0,1-Math.pow(i*16/135,2)), x=cx+dx;
+    const topY=y0+20*s*u, botY=y0+89*s*u, h1=(22+R2()*34)*s, h2=(18+R2()*30)*s;
+    g.fillStyle='#bdb59c'; g.strokeStyle='rgba(25,12,4,.8)'; g.lineWidth=1.2*s;
+    g.beginPath(); g.moveTo(x-9*s,topY-6*s); g.lineTo(x+(R2()-.5)*6*s,topY+h1); g.lineTo(x+9*s,topY-6*s); g.closePath(); g.fill(); g.stroke();   // răng trên
+    g.beginPath(); g.moveTo(x-9*s,botY+6*s); g.lineTo(x+(R2()-.5)*6*s,botY-h2); g.lineTo(x+9*s,botY+6*s); g.closePath(); g.fill(); g.stroke(); }  // răng dưới
   g.restore();
-  mouth(); g.strokeStyle='#2a0508'; g.lineWidth=5*s; g.lineJoin='round'; g.stroke();
+  mouth(); g.strokeStyle='#0f0303'; g.lineWidth=5*s; g.lineJoin='round'; g.stroke();
+  g.strokeStyle='rgba(85,6,6,.75)'; g.lineCap='round';                                     // vệt máu rỉ từ khóe miệng
+  [[x0+8*s,y0],[x1-8*s,y0],[cx-40*s,cy+100*s],[cx+55*s,cy+98*s]].forEach(p=>{ g.lineWidth=(3+R2()*3)*s; g.beginPath(); g.moveTo(p[0],p[1]+30*s); g.lineTo(p[0]+(R2()-.5)*6*s,p[1]+(70+R2()*90)*s); g.stroke(); });
+}
+function grime(g,w,h,cx,cy,r){                                                              // nứt rạn + ố bẩn
+  g.strokeStyle='rgba(30,22,6,.55)'; g.lineWidth=1.6;
+  for(let i=0;i<14;i++){ let a=rnd(0,6.28), x=cx+Math.cos(a)*r*rnd(.5,.95), y=cy+Math.sin(a)*r*rnd(.5,.95);
+    g.beginPath(); g.moveTo(x,y); for(let k=0;k<5;k++){ a+=rnd(-.7,.7); x+=Math.cos(a)*rnd(8,26); y+=Math.sin(a)*rnd(8,26); g.lineTo(x,y); } g.stroke(); }
+  stains(g,w,h,34,.38);
 }
 const faceTex=()=>T('face',512,640,(g,w,h)=>{          // cận mặt cho cảnh jumpscare (nền trong suốt, quả cầu tròn)
   g.clearRect(0,0,w,h);
-  const gr=g.createRadialGradient(w/2-50,h/2-70,20,w/2,h/2,255);gr.addColorStop(0,'#ffe44d');gr.addColorStop(.7,'#ffc800');gr.addColorStop(1,'#c98a00');
-  g.fillStyle=gr; g.beginPath(); g.arc(w/2,h/2,252,0,7); g.fill();
-  drawSmiley(g,w/2,h/2-6,1.7);
+  g.save(); g.beginPath(); g.arc(w/2,h/2,252,0,7); g.clip();
+  const gr=g.createRadialGradient(w/2-60,h/2-80,20,w/2,h/2,255);gr.addColorStop(0,'#b3a763');gr.addColorStop(.65,'#857b45');gr.addColorStop(1,'#2e2a15');
+  g.fillStyle=gr; g.fillRect(0,0,w,h);
+  grime(g,w,h,w/2,h/2,250);
+  drawSmiley(g,w/2,h/2-6,1.8);
+  noiseFx(g,w,h,22); g.restore();
 });
 const smileyMapTex=()=>T('smap',1024,512,(g,w,h)=>{     // bản đồ phủ quả cầu: mặt ở chính giữa phía trước (x = 256)
-  const gr=g.createLinearGradient(0,0,0,h);gr.addColorStop(0,'#ffd91f');gr.addColorStop(.5,'#ffc800');gr.addColorStop(1,'#d99a00');
+  const gr=g.createLinearGradient(0,0,0,h);gr.addColorStop(0,'#a79b5c');gr.addColorStop(.5,'#867c46');gr.addColorStop(1,'#4a4424');
   g.fillStyle=gr; g.fillRect(0,0,w,h);
-  g.fillStyle='rgba(255,150,60,.18)'; [[190,330],[322,330]].forEach(p=>{g.beginPath();g.ellipse(p[0],p[1],34,22,0,0,7);g.fill();});   // má ửng
+  grime(g,w,h,256,256,230); grime(g,w,h,768,256,230);
   drawSmiley(g,256,262,1.05);
-  noiseFx(g,w,h,10);});
-
+  noiseFx(g,w,h,26);});
 
 // ---------- Cơn bão bên ngoài cửa sổ (mưa, sét, sấm) ----------
 const haloTex=()=>T('halo',64,64,(g,w,h)=>{
@@ -874,10 +887,10 @@ const gArms=[], gHair=[], gMats=[]; let gHeadG, gMouth, gLight;
   // Ma = quả cầu mặt cười màu vàng, miệng toác đầy răng, lơ lửng giữa không trung
   gHeadG=new THREE.Group(); gHeadG.position.set(0,1.4,0); gBody.add(gHeadG);
   const mt=smileyMapTex();
-  const ballM=new THREE.MeshStandardMaterial({map:mt,emissiveMap:mt,emissive:0xffffff,emissiveIntensity:.8,roughness:.5});
+  const ballM=new THREE.MeshStandardMaterial({map:mt,emissiveMap:mt,emissive:0xffffff,emissiveIntensity:.28,roughness:.85});
   const ball=new THREE.Mesh(new THREE.SphereGeometry(.72,40,32),ballM); ball.castShadow=false; gHeadG.add(ball);
   gMouth=new THREE.Object3D(); gHeadG.add(gMouth);       // chỉ dùng scale.y làm nhịp "cười" cho animGhost
-  gLight=new THREE.PointLight(0xffe27a,0,11); gLight.position.set(0,1.5,1.3); gBody.add(gLight);
+  gLight=new THREE.PointLight(0xb9c4d8,0,11); gLight.position.set(0,1.5,1.3); gBody.add(gLight);
   const seen=new Set();
   ghostRoot.traverse(o=>{if(o.material&&!seen.has(o.material)){seen.add(o.material);o.material.transparent=true;o.material.opacity=0;gMats.push(o.material);}});
   ghostRoot.scale.set(1.05,1.05,1.05);
