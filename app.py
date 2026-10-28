@@ -414,6 +414,22 @@ GAME_HTML = r"""
   #mbg{background:#000}
   #mimg{inset:0;background:#000 url(__MENUBG__) 74% 50%/auto 94% no-repeat;animation:none}
   #msky{display:none}
+
+  /* ===== Bảng cốt truyện: bố cục 2 thẻ cạnh nhau, căn trái ===== */
+  #story{align-items:flex-start;justify-content:center;padding:0 80px;text-align:left;
+         background:linear-gradient(90deg,rgba(0,0,0,.92) 0%,rgba(0,0,0,.7) 60%,rgba(0,0,0,.45) 100%)}
+  #story .sty{max-width:none;width:100%;padding:0;margin:0 0 30px;text-align:left}
+  #story .sh{font-size:13px;letter-spacing:6px;color:#8a8a76;margin-bottom:18px;opacity:0;animation:sfade 1.2s ease .2s forwards}
+  #story .cols{display:flex;gap:24px;align-items:stretch}
+  #story .card{flex:1;padding:20px 24px 14px;background:rgba(0,0,0,.55);border-top:3px solid #f2d64b;opacity:0;animation:sfade 1.5s ease forwards}
+  #story .card:nth-child(1){animation-delay:.5s}
+  #story .card:nth-child(2){animation-delay:2.4s}
+  #story .card.danger{border-top-color:#d01a1a}
+  #story h4{margin:0 0 12px;font-size:16px;letter-spacing:5px;color:#f2d64b}
+  #story .danger h4{color:#ff4a3a}
+  #story ol,#story ul{margin:0;padding-left:20px;font-size:16px;line-height:1.65;color:#cfd2c4}
+  #story li{margin-bottom:10px}
+  #story ul{list-style:square}
 </style>
 </head>
 <body>
@@ -471,8 +487,25 @@ GAME_HTML = r"""
 
 <div id="story" class="ov">
   <div class="sty">
-    <p>Bạn bị nhốt lại ở sân trường giữa đêm bão. Chạy khắp các khu của trường, tìm <b class="cl">15 MẢNH GHÉP PHÁT SÁNG</b>. Mỗi mảnh phải <b>nhìn hình đoán đúng</b> mới lấy được, và mỗi mảnh lộ ra một phần <b>bức tranh bí ẩn</b>. Đoán đúng <b>từ khóa</b> của bức tranh (điền vào ô trống) thì <b>cổng thoát</b> sẽ mở.</p>
-    <p>Cô giáo ma <b>VERITY</b> luôn rình rập khi bạn trả lời câu hỏi. <b>Trả lời sai, cô ấy sẽ tới sớm hơn.</b> Trốn trong <b>bụi cây</b> hoặc <b>gầm bàn bóng bàn</b> (<kbd>E</kbd>).</p>
+    <div class="sh">ĐÊM BÃO · SÂN TRƯỜNG</div>
+    <div class="cols">
+      <div class="card">
+        <h4>NHIỆM VỤ</h4>
+        <ol>
+          <li>Bạn bị nhốt lại ở sân trường giữa đêm bão.</li>
+          <li>Chạy khắp các khu, tìm <b class="cl">15 MẢNH GHÉP PHÁT SÁNG</b>. Mỗi mảnh phải <b>nhìn hình đoán đúng</b> mới lấy được.</li>
+          <li>Mỗi mảnh lộ ra một phần <b>bức tranh bí ẩn</b>. Đoán đúng <b>từ khóa</b> (điền vào ô trống) thì <b>cổng thoát</b> sẽ mở.</li>
+        </ol>
+      </div>
+      <div class="card danger">
+        <h4>VERITY</h4>
+        <ul>
+          <li>Cô giáo ma <b>VERITY</b> luôn rình rập khi bạn trả lời câu hỏi.</li>
+          <li><b>Trả lời sai, cô ấy sẽ tới sớm hơn.</b></li>
+          <li>Trốn trong <b>bụi cây</b> hoặc <b>gầm bàn bóng bàn</b> (<kbd>E</kbd>).</li>
+        </ul>
+      </div>
+    </div>
   </div>
   <div class="mb"><button id="sgo">BẮT ĐẦU</button></div>
 </div>
