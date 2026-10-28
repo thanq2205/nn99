@@ -316,7 +316,6 @@ GAME_HTML = r"""
   #bars{position:absolute;inset:0;pointer-events:none;z-index:9;opacity:0;transition:opacity .6s;
         background:linear-gradient(#000 0 12%,transparent 12% 88%,#000 88%)}
   #bars.on{opacity:1}
-  #warn{z-index:25}
   .chk{display:flex;align-items:center;gap:10px;justify-content:center;margin:14px 0;color:#e0d6c0;font-size:16px;cursor:pointer}
   .chk input{width:20px;height:20px;accent-color:#b3141a;cursor:pointer}
   #lids{position:absolute;inset:0;display:none;pointer-events:none;z-index:11}
@@ -383,6 +382,33 @@ GAME_HTML = r"""
   .touch #mu{padding:10px 14px;font-size:18px;right:104px}
   #rot{position:fixed;inset:0;z-index:99;background:#000;color:#d9b45a;display:none;align-items:center;justify-content:center;
        text-align:center;padding:20px;font-size:22px;letter-spacing:2px}
+
+  /* ===== GIAO DIỆN MỚI: tối giản, chữ monospace, màu vàng; menu lệch trái, HUD ở góc dưới trái ===== */
+  .ov,#hud,#prompt,#banner,#help,#whisper{font-family:'Consolas','Courier New','Noto Sans Mono',monospace}
+  .ov h1{color:#f2d64b;font-weight:700;text-shadow:0 0 22px rgba(242,214,75,.35),0 0 4px #000}
+  .ov p,.hw{color:#cfd2c4}
+  .hw h3{color:#f2d64b;letter-spacing:3px;text-transform:uppercase;font-size:15px;border-bottom:1px solid rgba(242,214,75,.3);padding-bottom:3px}
+  button{background:transparent;color:#f2d64b;border:1px solid #f2d64b;border-radius:0;letter-spacing:2px;text-transform:uppercase}
+  button:hover{background:#f2d64b;color:#0b0b08;box-shadow:none}
+  .opt.bad{background:#1a1a12}
+  #menu{align-items:flex-start;justify-content:flex-end;padding:0 0 74px 96px;text-align:left;
+        background:linear-gradient(90deg,rgba(0,0,0,.9) 0%,rgba(0,0,0,.55) 38%,rgba(0,0,0,0) 72%)}
+  #menu h1{font-size:104px;letter-spacing:12px;margin:0 0 2px;line-height:1;color:#f2d64b;text-shadow:0 0 30px rgba(242,214,75,.4),0 0 4px #000}
+  #menu h1:after{content:'cô giáo ma · đêm bão · 15 mảnh ghép';display:block;font-size:15px;letter-spacing:5px;font-weight:400;color:#9a9a86;margin:10px 0 34px;text-transform:uppercase;text-shadow:none}
+  #menu .mb{align-items:flex-start;gap:0}
+  #menu .mb button{width:340px;text-align:left;font-size:21px;padding:13px 22px;margin:0;background:transparent;border:0;border-left:3px solid rgba(242,214,75,.22);color:#d8d8c4;letter-spacing:6px}
+  #menu .mb button:hover{background:rgba(242,214,75,.08);border-left-color:#f2d64b;color:#f2d64b;padding-left:34px;box-shadow:none}
+  #musichint{text-align:left;color:#7a7a68}
+  #story .mb button,#settings button,#howto button,#over button,#win button{border-radius:0}
+  #hud{top:auto;left:0;bottom:34px;padding:12px 20px 12px 18px;font-size:15px;line-height:1.45;background:linear-gradient(90deg,rgba(0,0,0,.72),rgba(0,0,0,0));border-left:3px solid #f2d64b}
+  #dn{font-size:13px;letter-spacing:4px;color:#f2d64b;text-transform:uppercase;margin-bottom:2px}
+  #ks{color:#f2d64b;font-size:16px}
+  #ot{font-size:12px;color:#a8a894;max-width:340px}
+  #stw{border-color:#f2d64b !important;background:rgba(0,0,0,.6) !important}
+  #help{top:8px;bottom:auto;left:12px;font-size:11px;color:#77776a}
+  #prompt{border:1px solid #f2d64b;background:rgba(0,0,0,.7);border-radius:0;letter-spacing:1px;font-size:16px}
+  #banner{font-size:20px;letter-spacing:1px;text-shadow:0 0 8px #000,0 0 3px #000}
+  #fs,#mu,#pz{background:rgba(0,0,0,.55);border-radius:0}
 </style>
 </head>
 <body>
@@ -480,21 +506,6 @@ GAME_HTML = r"""
     <p style="text-align:center;color:#8a8a8a;margin-top:14px"><i>Nên đeo tai nghe và tắt đèn phòng.</i></p>
   </div>
   <button id="hback">Quay lại</button>
-</div>
-
-<div id="warn" class="ov" style="display:flex">
-  <h1 style="color:#d9b45a;font-size:46px;letter-spacing:8px;text-shadow:0 0 14px #6a4a10">CẢNH BÁO</h1>
-  <div class="hw" style="width:620px">
-    <p style="margin:0 0 6px;max-width:none">Trò chơi này là game <b>kinh dị</b> và có chứa:</p>
-    <ul>
-      <li><b>Âm thanh lớn, đột ngột</b> (tiếng hét, tiếng động mạnh). Hãy hạ âm lượng trước khi chơi, nhất là khi đeo tai nghe.</li>
-      <li><b>Ánh sáng chớp nhanh, màn hình nhấp nháy</b>. Có thể gây khó chịu hoặc kích phát cơn co giật ở người nhạy cảm với ánh sáng / mắc chứng động kinh.</li>
-      <li><b>Cảnh hù dọa bất ngờ</b> (jumpscare) và hình ảnh rùng rợn.</li>
-      <li><b>Không phù hợp</b> với trẻ nhỏ, người có bệnh tim hoặc dễ hoảng sợ.</li>
-    </ul>
-    <p style="margin:10px 0 0;max-width:none">Nếu cảm thấy chóng mặt, buồn nôn, đau đầu hoặc khó chịu, hãy <b>dừng chơi ngay</b> và nghỉ ngơi.</p>
-  </div>
-  <button id="warnok" style="font-size:19px;padding:12px 30px">Tôi hiểu, tiếp tục</button>
 </div>
 
 <div id="over" class="ov"><h1>BẠN ĐÃ BỊ BẮT</h1><p id="overmsg"></p>
@@ -1781,7 +1792,6 @@ if(!inFrame&&location.hash==='#fromframe'&&window.opener){
 }
 function setRF(v){RF=!!v; saveNum('doors_rf',RF?1:0); $('rfchk2').checked=RF;}
 $('rfchk2').onchange=()=>setRF($('rfchk2').checked); setRF(RF);
-$('warnok').onclick=()=>{$('warn').style.display='none';};
 $('tomenu').onclick=toMenu; $('tomenu2').onclick=toMenu;
 $('sgo').onclick=()=>{storyStop();resetGame();};
 $('how').onclick=()=>showOnly('howto'); $('hback').onclick=()=>showOnly('menu');
