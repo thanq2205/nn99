@@ -430,6 +430,29 @@ GAME_HTML = r"""
   #story ol,#story ul{margin:0;padding-left:20px;font-size:16px;line-height:1.65;color:#cfd2c4}
   #story li{margin-bottom:10px}
   #story ul{list-style:square}
+
+  /* ===== BẢNG PHẤN: đổi màu chủ đạo sang trắng phấn + xanh bảng, bỏ vàng ===== */
+  .ov h1{color:#e8f1e4;text-shadow:0 0 18px rgba(180,230,190,.3),0 0 4px #000}
+  .hw h3{color:#9fd8a8;letter-spacing:2px;text-transform:none;border-bottom:1px dashed rgba(159,216,168,.4)}
+  button{color:#e8f1e4;border:2px dashed #9fd8a8;letter-spacing:1px;text-transform:none;border-radius:6px}
+  button:hover{background:#9fd8a8;color:#0c1a12}
+  #menu{align-items:center;justify-content:flex-start;padding:60px 0 0 0;text-align:center;
+        background:linear-gradient(180deg,rgba(6,20,14,.88) 0%,rgba(6,20,14,.5) 55%,rgba(0,0,0,.1) 100%)}
+  #menu h1{font-size:64px;letter-spacing:4px;color:#e8f1e4;text-shadow:0 0 24px rgba(159,216,168,.4),0 0 4px #000}
+  #menu h1:after{content:'cô giáo ma · đêm bão · 15 mảnh ghép';color:#8fb59a;letter-spacing:3px;text-transform:none}
+  #menu .mb{align-items:center}
+  #menu .mb button{width:300px;text-align:center;border:2px dashed rgba(159,216,168,.5);border-left:2px dashed rgba(159,216,168,.5);letter-spacing:2px;color:#e8f1e4;border-radius:6px;margin:6px 0}
+  #menu .mb button:hover{background:rgba(159,216,168,.15);border-color:#9fd8a8;color:#fff;padding-left:22px}
+  #musichint{text-align:center;color:#6f9a7a}
+  #hud{left:auto;right:0;bottom:34px;padding:12px 18px 12px 20px;background:linear-gradient(270deg,rgba(0,0,0,.72),rgba(0,0,0,0));border-left:0;border-right:3px solid #9fd8a8;text-align:right}
+  #dn,#ks{color:#9fd8a8}
+  #stw{border-color:#9fd8a8 !important}
+  #prompt{border:2px dashed #9fd8a8;border-radius:6px}
+  #fs,#mu,#pz{border-radius:50%}
+  #story{align-items:center;text-align:center}
+  #story .card{border-top:0;border-bottom:3px solid #9fd8a8}
+  #story h4{color:#9fd8a8}
+  #box{background:#12281d !important;border:6px solid #6b4a2b !important;color:#eef3ea !important}
 </style>
 </head>
 <body>
@@ -460,13 +483,13 @@ GAME_HTML = r"""
 </div></div>
 
 <div id="menu" class="ov" style="display:flex">
-  <h1>VERITY ESCAPE</h1>
+  <h1>TRƯỜNG LÚC NỬA ĐÊM</h1>
   <div class="mb">
-    <button id="start">CHƠI</button>
-    <button id="how">HƯỚNG DẪN</button>
-    <button id="settingsBtn">CÀI ĐẶT</button>
+    <button id="start">VÀO LỚP</button>
+    <button id="how">CÁCH CHƠI</button>
+    <button id="settingsBtn">TÙY CHỈNH</button>
   </div>
-  <p id="musichint">Bấm vào bất kỳ đâu để bật nhạc</p>
+  <p id="musichint">Chạm vào màn hình để mở nhạc</p>
 </div>
 
 <div id="settings" class="ov">
@@ -482,7 +505,7 @@ GAME_HTML = r"""
     <h3>Âm lượng nhạc</h3>
     <div class="row"><input id="vr" type="range" min="0" max="100" step="5" value="60"><span id="vv">60%</span></div>
   </div>
-  <button id="sback">Quay lại</button>
+  <button id="sback">Trở về</button>
 </div>
 
 <div id="story" class="ov">
@@ -541,14 +564,14 @@ GAME_HTML = r"""
       <li>Nếu Verity bắt được, bạn <b>chết</b> và phải <b>chơi lại từ đầu</b> (mất hết mảnh ghép).</li>
       <li>Những đôi mắt đỏ trong bóng tối sẽ biến mất khi bạn nhìn thẳng vào chúng.</li>
     </ul>
-    <p style="text-align:center;color:#8a8a8a;margin-top:14px"><i>Nên đeo tai nghe và tắt đèn phòng.</i></p>
+    <p style="text-align:center;color:#8a8a8a;margin-top:14px"><i>Hãy đeo tai nghe, tắt đèn và đừng quay đầu lại.</i></p>
   </div>
-  <button id="hback">Quay lại</button>
+  <button id="hback">Trở về</button>
 </div>
 
-<div id="over" class="ov"><h1>BẠN ĐÃ BỊ BẮT</h1><p id="overmsg"></p>
+<div id="over" class="ov"><h1>CÔ ĐÃ TÓM ĐƯỢC EM</h1><p id="overmsg"></p>
   <div><button id="retry">Chơi lại từ đầu</button><button id="tomenu">Menu</button></div></div>
-<div id="win" class="ov"><h1 style="color:#d9b45a">THOÁT ĐƯỢC!</h1><p>Bạn đã trốn khỏi trường... nhưng Verity vẫn đang đứng nhìn bạn từ cửa sổ tầng hai.</p>
+<div id="win" class="ov"><h1 style="color:#d9b45a">RA KHỎI TRƯỜNG RỒI!</h1><p>Bạn đã trốn khỏi trường... nhưng Verity vẫn đang đứng nhìn bạn từ cửa sổ tầng hai.</p>
   <div><button id="again">Chơi lại</button><button id="tomenu2">Menu</button></div></div>
 
 </div></div>
@@ -1406,8 +1429,8 @@ function tone(f,d,type,v,f2){try{const a=ac(),o=a.createOscillator(),g=a.createG
 function noise(d,v){try{const a=ac(),n=Math.floor(a.sampleRate*d),b=a.createBuffer(1,n,a.sampleRate),x=b.getChannelData(0);
   for(let i=0;i<n;i++)x[i]=(Math.random()*2-1)*(1-i/n);const s=a.createBufferSource(),g=a.createGain();
   g.gain.value=v;s.buffer=b;s.connect(g).connect(a.destination);s.start();}catch(e){}}
-const sGood=()=>{tone(660,.15,'sine',.15);setTimeout(()=>tone(990,.3,'sine',.15),120);};
-const sBad=()=>{tone(160,.4,'sawtooth',.2,60);noise(.3,.25);};
+const sGood=()=>{tone(523,.18,'triangle',.16);setTimeout(()=>tone(784,.18,'triangle',.16),110);setTimeout(()=>tone(1047,.4,'triangle',.14),230);};
+const sBad=()=>{tone(220,.5,'square',.14,90);setTimeout(()=>tone(150,.5,'square',.14,60),140);noise(.35,.2);};
 function scream(){
   try{const a=ac(),t0=a.currentTime;
     const mk=(type,f0,f1,vol,dur)=>{const o=a.createOscillator(),g=a.createGain();o.type=type;
@@ -1498,7 +1521,7 @@ function footstep(run){
   if(!stBuf){ noise(.07,.08); tone(70,.09,'sine',.1,40); return; }   // chưa có file -> tiếng tổng hợp cũ
   try{
     const a=ac(); let i; do{ i=Math.floor(Math.random()*SCLIPS.length); }while(i===lastStep&&SCLIPS.length>1); lastStep=i;
-    const c=SCLIPS[i], iv=run?.32:.5, rate=(run?1.18:1)*(1+(Math.random()-.5)*.06);
+    const c=SCLIPS[i], iv=run?.3:.46, rate=(run?1.18:1)*(1+(Math.random()-.5)*.06);
     const dur=Math.min(.5,iv*1.4*rate), wall=dur/rate, t=a.currentTime;
     const v=Math.max(.5,Math.min(2.5,STEP_REF/c[1]))*STEP_VOL*(run?1.1:1);   // cân lại độ to cho các bước đều nhau
     const g=a.createGain(), s=a.createBufferSource(); s.buffer=stBuf; s.playbackRate.value=rate;
@@ -2450,7 +2473,7 @@ function update(dt){
       if(!hit(camera.position.x+dx,camera.position.z)) camera.position.x+=dx;
       if(!hit(camera.position.x,camera.position.z+dzz)) camera.position.z+=dzz;
       bob+=dt*(run?12:9);
-      stepT-=dt; if(stepT<=0){footstep(run);stepT=run?.32:.5;}
+      stepT-=dt; if(stepT<=0){footstep(run);stepT=run?.3:.46;}
     }
     const nb=rooms[door+1], pb=rooms[door-1];
     const inLine=Math.abs(camera.position.x)<.8;
