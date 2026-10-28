@@ -2551,9 +2551,5 @@ _html = (GAME_HTML.replace("__DATA__", build_data())
          .replace("__THUNDER__", load_asset(THUNDER_FILE, "audio/mpeg"))
          .replace("__RAIN__", load_asset(RAIN_FILE, "audio/wav"))
          .replace("__TCLIPS__", json.dumps(THUNDER_CLIPS)))
-if not load_mp3(MUSIC_FILE, PLAY_MUSIC_FILE, True):
-    st.warning(f"Không tìm thấy file nhạc '{MUSIC_FILE}'. Hãy đặt nó cùng thư mục với app.py để có nhạc ở menu.")
-if not load_mp3(PLAY_MUSIC_FILE):
-    st.warning(f"Không tìm thấy file nhạc '{PLAY_MUSIC_FILE}'. Hãy đặt nó cùng thư mục với app.py để có nhạc nền khi chơi.")
 components.html(_html, height=720, scrolling=False)
 st.download_button("Tải game (.html) để chơi độc lập", _html, file_name="escape.html", mime="text/html")
