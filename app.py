@@ -794,7 +794,7 @@ function drawSmiley(g,cx,cy,s){
     const sh=g.createRadialGradient(0,0,6*s,0,0,62*s); sh.addColorStop(0,'rgba(12,8,0,.9)'); sh.addColorStop(1,'rgba(12,8,0,0)');
     g.fillStyle=sh; g.beginPath(); g.ellipse(0,0,62*s,76*s,0,0,7); g.fill();            // quầng thâm quanh mắt
     g.fillStyle='#030202'; g.beginPath(); g.ellipse(0,0,(k?21:16)*s,(k?42:34)*s,0,0,7); g.fill();
-    g.fillStyle='#cfc9b8'; g.beginPath(); g.arc(1*s,-3*s,2.6*s,0,7); g.fill(); g.restore(); });   // đồng tử bé xíu
+    g.shadowColor='#ff0000'; g.shadowBlur=18*s; g.fillStyle='#ff1a12'; g.beginPath(); g.arc(1*s,-2*s,(k?9:7)*s,0,7); g.fill(); g.fillStyle='#ff8a70'; g.beginPath(); g.arc(1*s,-3*s,2.6*s,0,7); g.fill(); g.restore(); });   // mắt đỏ phát sáng
   const x0=cx-135*s, x1=cx+135*s, y0=cy+22*s;
   const mouth=()=>{ g.beginPath(); g.moveTo(x0,y0); g.quadraticCurveTo(cx,cy+200*s,x1,y0); g.quadraticCurveTo(cx,cy+62*s,x0,y0); g.closePath(); };
   mouth(); g.fillStyle='#090102'; g.fill();
@@ -935,12 +935,26 @@ const gBody=new THREE.Group(); ghostRoot.add(gBody);
 const gArms=[], gHair=[], gMats=[]; let gHeadG, gMouth, gLight;
 (function(){
   // Ma = quả cầu mặt cười màu vàng, miệng toác đầy răng, lơ lửng giữa không trung
-  gHeadG=new THREE.Group(); gHeadG.position.set(0,1.4,0); gBody.add(gHeadG);
+  gHeadG=new THREE.Group(); gHeadG.position.set(0,1.95,0); gBody.add(gHeadG);
+  // thân người màu vàng: cổ, thân, hai tay (vai + khuỷu), hai chân
+  const yel=new THREE.MeshStandardMaterial({color:0xd8c030,roughness:.8,emissive:0x4a3c00,emissiveIntensity:.5});
+  const cyl2=(r0,r1,len,x,y,z,par)=>{const m=new THREE.Mesh(new THREE.CylinderGeometry(r1,r0,len,12),yel);m.position.set(x,y,z);(par||gBody).add(m);return m;};
+  cyl2(.14,.14,.4,0,1.35,0);            // cổ
+  cyl2(.36,.26,1.0,0,.85,0);            // thân
+  [-1,1].forEach((sg,i)=>{
+    const sh=new THREE.Group(); sh.position.set(sg*.44,1.25,0); gBody.add(sh);
+    cyl2(.1,.09,.7,0,-.35,0,sh);        // cánh tay trên
+    const el=new THREE.Group(); el.position.set(0,-.7,0); sh.add(el);
+    cyl2(.09,.07,.65,0,-.32,0,el);      // cẳng tay
+    const hd=new THREE.Mesh(new THREE.SphereGeometry(.11,10,8),yel); hd.position.set(0,-.68,0); el.add(hd);   // bàn tay
+    gArms.push({sh,el});
+    cyl2(.12,.09,.7,sg*.17,.05,0);      // chân
+  });
   const mt=smileyMapTex();
-  const ballM=new THREE.MeshStandardMaterial({map:mt,emissiveMap:mt,emissive:0xffffff,emissiveIntensity:.28,roughness:.85});
+  const ballM=new THREE.MeshStandardMaterial({map:mt,emissiveMap:mt,emissive:0xffffff,emissiveIntensity:.55,roughness:.85});
   const ball=new THREE.Mesh(new THREE.SphereGeometry(.72,40,32),ballM); ball.castShadow=false; gHeadG.add(ball);
   gMouth=new THREE.Object3D(); gHeadG.add(gMouth);       // chỉ dùng scale.y làm nhịp "cười" cho animGhost
-  gLight=new THREE.PointLight(0xb9c4d8,0,11); gLight.position.set(0,1.5,1.3); gBody.add(gLight);
+  gLight=new THREE.PointLight(0xb9c4d8,0,11); gLight.position.set(0,1.9,1.3); gBody.add(gLight);
   const seen=new Set();
   ghostRoot.traverse(o=>{if(o.material&&!seen.has(o.material)){seen.add(o.material);o.material.transparent=true;o.material.opacity=0;gMats.push(o.material);}});
   ghostRoot.scale.set(1.05,1.05,1.05);
