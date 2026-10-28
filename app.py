@@ -453,6 +453,20 @@ GAME_HTML = r"""
   #story .card{border-top:0;border-bottom:3px solid #9fd8a8}
   #story h4{color:#9fd8a8}
   #box{background:#12281d !important;border:6px solid #6b4a2b !important;color:#eef3ea !important}
+  #box,#box button,#box input{font-family:'Segoe UI','Roboto','Arial',sans-serif !important}
+  #box #mq,#box .opt,#box #fb,#box #vd{text-transform:none !important;letter-spacing:0 !important}
+  #box #mq{font-weight:700 !important}
+  #box #mt{color:#ffe38a !important}
+  #box #mq{color:#f4f8f1 !important;text-shadow:none}
+  #box #vd,#box #fb{color:#ffb3a6 !important}
+  #box #mi{color:#f4f8f1 !important;background:rgba(255,255,255,.08) !important;border-bottom:3px solid #9fd8a8 !important}
+  #box button{color:#f4f8f1 !important;background:rgba(255,255,255,.08) !important;border:2px solid #9fd8a8 !important;text-shadow:none}
+  #box button:hover{background:#9fd8a8 !important;color:#0c1a12 !important}
+  #box .opt{color:#f4f8f1 !important;background:rgba(255,255,255,.07) !important;font-weight:700}
+  #box .opt b{color:#ffe38a !important;border:3px solid #ffe38a !important}
+  #box .opt.bad{color:#9aa89c !important;background:rgba(0,0,0,.25) !important;border-color:#4d6455 !important}
+  #box .opt.bad:hover{background:rgba(0,0,0,.25) !important;color:#9aa89c !important}
+  #box #mpic img,#box.pz #mpic canvas{border-color:#f4f8f1}
 </style>
 </head>
 <body>
