@@ -1,5 +1,5 @@
 """
-VERITY – Game kinh dị góc nhìn thứ nhất: bị cô giáo ma Verity truy đuổi trong trường học, vừa chạy vừa trả lời câu hỏi bài tập
+VERITY ESCAPE – Game kinh dị góc nhìn thứ nhất: bị cô giáo ma Verity truy đuổi trong trường học, vừa chạy vừa trả lời câu hỏi bài tập
 Chạy:  streamlit run app.py
 Đặt file nhạc "doors-roblox-ost-elevator-jam-made-with-Voicemod.mp3" cùng thư mục với app.py.
 Game 3D chạy bằng Three.js, nhúng vào Streamlit qua components.html.
@@ -11,7 +11,7 @@ from pathlib import Path
 import streamlit as st
 import streamlit.components.v1 as components
 
-st.set_page_config(page_title="VERITY", layout="wide")
+st.set_page_config(page_title="VERITY ESCAPE", layout="wide")
 
 
 # ---------------------------------------------------------------------------
@@ -393,7 +393,7 @@ GAME_HTML = r"""
   .opt.bad{background:#1a1a12}
   #menu{align-items:flex-start;justify-content:flex-end;padding:0 0 74px 96px;text-align:left;
         background:linear-gradient(90deg,rgba(0,0,0,.9) 0%,rgba(0,0,0,.55) 38%,rgba(0,0,0,0) 72%)}
-  #menu h1{font-size:104px;letter-spacing:12px;margin:0 0 2px;line-height:1;color:#f2d64b;text-shadow:0 0 30px rgba(242,214,75,.4),0 0 4px #000}
+  #menu h1{font-size:76px;letter-spacing:8px;white-space:nowrap;margin:0 0 2px;line-height:1;color:#f2d64b;text-shadow:0 0 30px rgba(242,214,75,.4),0 0 4px #000}
   #menu h1:after{content:'cô giáo ma · đêm bão · 15 mảnh ghép';display:block;font-size:15px;letter-spacing:5px;font-weight:400;color:#9a9a86;margin:10px 0 34px;text-transform:uppercase;text-shadow:none}
   #menu .mb{align-items:flex-start;gap:0}
   #menu .mb button{width:340px;text-align:left;font-size:21px;padding:13px 22px;margin:0;background:transparent;border:0;border-left:3px solid rgba(242,214,75,.22);color:#d8d8c4;letter-spacing:6px}
@@ -444,7 +444,7 @@ GAME_HTML = r"""
 </div></div>
 
 <div id="menu" class="ov" style="display:flex">
-  <h1>VERITY</h1>
+  <h1>VERITY ESCAPE</h1>
   <div class="mb">
     <button id="start">CHƠI</button>
     <button id="how">HƯỚNG DẪN</button>
@@ -2568,4 +2568,4 @@ _html = (GAME_HTML.replace("__DATA__", build_data())
          .replace("__RAIN__", load_asset(RAIN_FILE, "audio/wav"))
          .replace("__TCLIPS__", json.dumps(THUNDER_CLIPS)))
 components.html(_html, height=720, scrolling=False)
-st.download_button("Tải game (.html) để chơi độc lập", _html, file_name="escape.html", mime="text/html")
+st.download_button("Tải game (.html) để chơi độc lập", _html, file_name="verity_escape.html", mime="text/html")
